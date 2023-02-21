@@ -9,8 +9,9 @@ import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.services.Services
 
 typealias OnLikeListener = (post: Post) -> Unit
+typealias OnSharedListener = (post: Post) -> Unit
 
-class PostsAdapter(private val onLikeListener: OnLikeListener) :
+class PostsAdapter(private val onLikeListener: OnLikeListener, private val onSharedListener: OnSharedListener) :
     RecyclerView.Adapter<PostViewHolder>() {
     var list = emptyList<Post>()
         set(value) {
@@ -20,7 +21,7 @@ class PostsAdapter(private val onLikeListener: OnLikeListener) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = CardPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return PostViewHolder(binding, onLikeListener)
+        return PostViewHolder(binding, onLikeListener, onSharedListener)
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
@@ -33,7 +34,8 @@ class PostsAdapter(private val onLikeListener: OnLikeListener) :
 
 class PostViewHolder(
     private val binding: CardPostBinding,
-    private val onLikeListener: OnLikeListener
+    private val onLikeListener: OnLikeListener,
+    private val onSharedListener: OnSharedListener
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(post: Post) {
         binding.apply {
@@ -49,18 +51,14 @@ class PostViewHolder(
                 if (post.likedByMe) R.drawable.ic_baseline_favorite_24 else R.drawable.ic_baseline_favorite_border_24
             )
 
-//            share.setOnClickListener {
-//                      //  viewModel.sharedById(post.id,post.shared+100)
-//                        onsSharedListener(post)
-//                    }
+            share.setOnClickListener {
+                onSharedListener(post)
+            }
 
             like.setOnClickListener {
                 onLikeListener(post)
             }
 
-//            like.setOnClickListener{
-//                onLikeListener(post)
-//            }
         }
     }
 }
