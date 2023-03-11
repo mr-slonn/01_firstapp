@@ -7,4 +7,10 @@
     <string name="description_share_ico">Поделились</string>
     <string name="description_favorite_ico">Лайков</string>
     <string name="description_red_eye_ico">Просмотров</string>
+    <string name="description_post_save">Сохранить</string>
+    <string name="menu_edit">Изменить</string>
+    <string name="menu_remove">Удалить</string>
+    <string name="post_text">Текст поста</string>
+    <string name="description_post_cancel">Отменить</string>
+    <string name="error_empty_content">Контент не может быть пустым</string>
 </resources>
