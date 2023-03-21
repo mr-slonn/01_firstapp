@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.cancel.setOnClickListener {
-
+            viewModel.cancel()
             with(binding.content) {
 
                 binding.group.visibility = View.GONE
