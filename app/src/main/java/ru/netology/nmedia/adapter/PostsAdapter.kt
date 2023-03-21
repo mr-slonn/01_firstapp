@@ -44,13 +44,14 @@ class PostViewHolder(
             published.text = post.published
             content.text = post.content
 
-            shared.text = Services().countWithSuffix(post.shared)
-            likeCount.text = Services().countWithSuffix(post.likes)
+            share.text = Services().countWithSuffix(post.shared)
+            like.text = Services().countWithSuffix(post.likes)
+            like.isChecked = post.likedByMe
             viewsCount.text = Services().countWithSuffix(post.viewsCount)
 
-            like.setImageResource(
-                if (post.likedByMe) R.drawable.ic_baseline_favorite_24 else R.drawable.ic_baseline_favorite_border_24
-            )
+//            like.setImageResource(
+//                if (post.likedByMe) R.drawable.ic_baseline_favorite_24 else R.drawable.ic_baseline_favorite_border_24
+//            )
 
             share.setOnClickListener {
                 onInteractionListener.onShared(post)
