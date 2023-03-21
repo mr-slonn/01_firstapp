@@ -9,107 +9,18 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toTopOf="@id/toolsTop"
-        app:layout_constraintTop_toTopOf="parent"
         tools:listitem="@layout/card_post" />
 
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/group"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:constraint_referenced_ids="editLogo, titleEdit,editedContent, cancel" />
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/toolsTop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="top"
-        app:constraint_referenced_ids="editLogo, titleEdit, editedContent, cancel " />
-
-
-    <ImageView
-        android:id="@+id/editLogo"
-        android:layout_width="@dimen/icon_size"
-        android:layout_height="@dimen/icon_size"
-        android:layout_marginStart="@dimen/icon_spacing"
-        android:contentDescription="@string/menu_edit"
-        android:src="@drawable/ic_baseline_edit_note_24"
-        app:layout_constraintBottom_toBottomOf="@+id/editedContent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/titleEdit" />
-
-    <TextView
-        android:id="@+id/titleEdit"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="@string/menu_edit"
-        android:singleLine="true"
-        android:textColor="@color/purple_500"
-        android:textColorHint="#757575"
-        app:layout_constraintStart_toEndOf="@+id/editLogo"
-        app:layout_constraintTop_toTopOf="@id/toolsTop" />
-
-    <TextView
-        android:id="@+id/editedContent"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:singleLine="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/cancel"
-        app:layout_constraintStart_toStartOf="@+id/titleEdit"
-        app:layout_constraintTop_toBottomOf="@+id/titleEdit"
-        app:layout_constraintVertical_bias="0.0"
-        tools:text="@sample/posts.json/data/content" />
-
-    <ImageButton
-        android:id="@+id/cancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/icon_spacing"
-        android:layout_marginEnd="@dimen/icon_spacing"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/description_post_cancel"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/toolsTop"
-        app:srcCompat="@drawable/ic_baseline_cancel_24"
-        tools:ignore="TouchTargetSizeCheck" />
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/barrierAfterTitleEdit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:barrierDirection="bottom"
-        app:constraint_referenced_ids="cancel, editedContent, titleEdit, editLogo" />
-
-    <EditText
-        android:id="@+id/content"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:hint="@string/post_text"
-        android:importantForAutofill="no"
-        android:inputType="textMultiLine"
-        android:padding="@dimen/common_spacing"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/save"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/barrierAfterTitleEdit" />
-
-    <ImageButton
-        android:id="@+id/save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/icon_spacing"
-        android:layout_marginBottom="@dimen/icon_spacing"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/description_post_save"
+        android:layout_margin="@dimen/fab_margin"
+        android:contentDescription="@string/add_post"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/content"
-        app:srcCompat="@drawable/ic_baseline_check_circle_outline_24" />
+        app:srcCompat="@drawable/ic_add_24dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
