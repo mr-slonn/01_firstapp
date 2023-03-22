@@ -17,4 +17,6 @@
     <string name="add_post">Добавить пост</string>
     <string name="edit_post">Изменить пост</string>
     <string name="save">Сохранить</string>
+    <string name="video">Видео</string>
+    <string name="play">Воспроизвести</string>
 </resources>

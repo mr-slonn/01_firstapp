@@ -9,4 +9,5 @@ data class Post(
     var likedByMe: Boolean = false,
     var shared: Int = 0,
     var viewsCount: Int =0,
+    var video: String ? = null,
     )

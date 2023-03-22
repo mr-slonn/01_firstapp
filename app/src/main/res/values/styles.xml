@@ -29,4 +29,8 @@
         <item name="android:textColor">@color/teal_700</item>
     </style>
 
+    <style name="Widget.AppCompat.FloatingButtons" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="buttonTint">@color/white</item>
+    </style>
+
 </resources>
