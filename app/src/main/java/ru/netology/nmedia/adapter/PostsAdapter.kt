@@ -55,6 +55,11 @@ class PostViewHolder(
                 videoLayout.visibility = View.VISIBLE
                 content.visibility = View.GONE
             }
+            else
+            {
+                videoLayout.visibility = View.GONE
+                content.visibility = View.VISIBLE
+            }
 
             videoLayout.setOnClickListener {
                 onInteractionListener.onPlayVideo(post)
