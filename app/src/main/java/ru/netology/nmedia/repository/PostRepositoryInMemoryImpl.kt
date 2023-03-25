@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package ru.netology.nmedia.repository
 
 import androidx.lifecycle.LiveData
@@ -75,6 +77,10 @@ class PostRepositoryInMemoryImpl : PostRepository {
 
     private val data = MutableLiveData(posts)
     override fun getAll(): LiveData<List<Post>> = data
+    override fun getById(id: Long): Post? {
+        return data.value?.firstOrNull { it.id == id }
+            ?.copy()
+    }
     override fun likeById(id: Long) {
         posts = posts.map {
             if (it.id != id) it else it.copy(

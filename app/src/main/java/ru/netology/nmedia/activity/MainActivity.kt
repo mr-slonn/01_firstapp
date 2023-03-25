@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
                 viewModel.likeById(post.id)
             }
 
-            override fun onShared(post: Post) {
+            override fun onShare(post: Post) {
                 viewModel.sharedById(post.id)
                 val intent = Intent().apply {
                     action = Intent.ACTION_SEND

@@ -14,10 +14,11 @@ import ru.netology.nmedia.services.Services
 
 interface OnInteractionListener {
     fun onLike(post: Post) {}
-    fun onShared(post: Post) {}
+    fun onShare(post: Post) {}
     fun onRemove(post: Post) {}
     fun onEdit(post: Post) {}
     fun onPlayVideo(post: Post) {}
+    fun onViewPost(post: Post) {}
 }
 
 
@@ -35,6 +36,8 @@ class PostsAdapter(
     }
 
 }
+
+
 
 class PostViewHolder(
     private val binding: CardPostBinding,
@@ -68,13 +71,17 @@ class PostViewHolder(
                 onInteractionListener.onPlayVideo(post)
             }
 
+            content.setOnClickListener {
+                onInteractionListener.onViewPost(post)
+            }
+
 
 //            like.setImageResource(
 //                if (post.likedByMe) R.drawable.ic_baseline_favorite_24 else R.drawable.ic_baseline_favorite_border_24
 //            )
 
             share.setOnClickListener {
-                onInteractionListener.onShared(post)
+                onInteractionListener.onShare(post)
             }
 
             like.setOnClickListener {

@@ -28,6 +28,10 @@ class PostRepositorySharedPrefsImpl(
     }
     // для презентации убрали пустые строки
     override fun getAll(): LiveData<List<Post>> = data
+    override fun getById(id: Long): Post? {
+        return data.value?.firstOrNull { it.id == id }
+            ?.copy()
+    }
     override fun save(post: Post) {
         if (post.id == 0L) {
             // TODO: remove hardcoded author & published
