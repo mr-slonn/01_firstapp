@@ -1,24 +1,19 @@
 package ru.netology.nmedia.activity
 
+
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.MenuItem
-
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
-
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-
 import ru.netology.nmedia.R
-
-
 import ru.netology.nmedia.databinding.FragmentPostBinding
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.services.Services
@@ -46,8 +41,6 @@ class PostFragment : Fragment() {
     }
 
 
-
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -59,12 +52,11 @@ class PostFragment : Fragment() {
         requireActivity().onBackPressedDispatcher.addCallback {
             actionBar?.setDisplayHomeAsUpEnabled(false)
             actionBar?.setDisplayShowHomeEnabled(false)
+            actionBar?.title = getString(R.string.nmedia)
             findNavController().navigateUp()
-
         }
-
-
         actionBar?.setDisplayShowHomeEnabled(true)
+        actionBar?.setDisplayHomeAsUpEnabled(true)
 
         return binding.root
     }

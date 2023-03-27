@@ -29,8 +29,6 @@ class NewPostFragment : Fragment() {
     )
 
 
-
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -55,11 +53,13 @@ class NewPostFragment : Fragment() {
         }
 
         actionBar?.setDisplayShowHomeEnabled(true)
+        actionBar?.setDisplayHomeAsUpEnabled(true)
         actionBar?.title = if (text != null) getString(R.string.edit_post) else getString(R.string.add_post)
 
         binding.edit.setText(text)
 
         binding.ok.setOnClickListener {
+            actionBar?.title = getString(R.string.nmedia)
             viewModel.changeContent(binding.edit.text.toString())
             viewModel.save()
             AndroidUtils.hideKeyboard(requireView())
