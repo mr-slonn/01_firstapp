@@ -5,10 +5,13 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MenuItem
 
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import androidx.activity.addCallback
+import androidx.appcompat.app.AppCompatActivity
 
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -43,12 +46,25 @@ class PostFragment : Fragment() {
     }
 
 
+
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPostBinding.inflate(inflater, container, false)
+
+        val actionBar = (activity as AppCompatActivity).supportActionBar
+        requireActivity().onBackPressedDispatcher.addCallback {
+            actionBar?.setDisplayHomeAsUpEnabled(false)
+            actionBar?.setDisplayShowHomeEnabled(false)
+            findNavController().navigateUp()
+
+        }
+
+
+        actionBar?.setDisplayShowHomeEnabled(true)
 
         return binding.root
     }

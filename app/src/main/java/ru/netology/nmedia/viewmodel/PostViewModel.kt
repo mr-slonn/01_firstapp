@@ -46,6 +46,11 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
+    fun cancelEdit() {
+
+        edited.value = empty
+    }
+
     fun save() {
         edited.value?.let {
             repository.save(it)
