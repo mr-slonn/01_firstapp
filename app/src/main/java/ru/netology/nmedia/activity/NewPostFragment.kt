@@ -59,11 +59,13 @@ class NewPostFragment : Fragment() {
         binding.edit.setText(text)
 
         binding.ok.setOnClickListener {
-            actionBar?.title = getString(R.string.nmedia)
             viewModel.changeContent(binding.edit.text.toString())
             viewModel.save()
             AndroidUtils.hideKeyboard(requireView())
             findNavController().navigateUp()
+            actionBar?.title = getString(R.string.nmedia)
+            actionBar?.setDisplayHomeAsUpEnabled(false)
+            actionBar?.setDisplayShowHomeEnabled(false)
         }
         return binding.root
     }
