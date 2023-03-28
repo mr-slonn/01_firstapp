@@ -3,14 +3,13 @@ package ru.netology.nmedia.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import ru.netology.nmedia.db.AppDb
-
+//import ru.netology.nmedia.db.AppDb
+import ru.netology.nmedia.db.AppDbRoom
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.repository.PostRepository
+import ru.netology.nmedia.repository.PostRepositoryRoomImpl
 
-import ru.netology.nmedia.repository.PostRepositorySQLiteImpl
-
-
+//import ru.netology.nmedia.repository.PostRepositorySQLiteImpl
 //import ru.netology.nmedia.repository.PostRepositorySharedPrefsImpl
 //import ru.netology.nmedia.repository.PostRepositoryFileImpl
 //import ru.netology.nmedia.repository.PostRepositoryInMemoryImpl
@@ -29,13 +28,17 @@ private val empty = Post(
 class PostViewModel(application: Application) : AndroidViewModel(application) {
 
 
-    //private val repository: PostRepository = PostRepositoryInMemoryImpl()
-    //private val repository: PostRepository = PostRepositorySharedPrefsImpl(application)
+    // private val repository: PostRepository = PostRepositoryInMemoryImpl()
+    // private val repository: PostRepository = PostRepositorySharedPrefsImpl(application)
 
-    //private val repository: PostRepository = PostRepositoryFileImpl(application)
+    // private val repository: PostRepository = PostRepositoryFileImpl(application)
 
-    private val repository: PostRepository = PostRepositorySQLiteImpl(
-        AppDb.getInstance(application).postDao
+    // private val repository: PostRepository = PostRepositorySQLiteImpl(
+    //      AppDb.getInstance(application).postDao
+    // )
+
+    private val repository: PostRepository = PostRepositoryRoomImpl(
+        AppDbRoom.getInstance(context = application).postDaoRoom()
     )
 
     val data = repository.getAll()
@@ -46,6 +49,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     fun removeById(id: Long) = repository.removeById(id)
 
     fun getPost(id: Long): Post? {
+        // TODO: не помнимою как открывать новый пост запросом из базы
+
         return data.value?.firstOrNull { it.id == id }
             ?.copy()
     }
