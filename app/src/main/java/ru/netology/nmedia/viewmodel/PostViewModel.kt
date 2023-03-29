@@ -50,7 +50,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getPost(id: Long): Post? {
         // TODO: не помнимою как открывать новый пост запросом из базы
-
         return data.value?.firstOrNull { it.id == id }
             ?.copy()
     }
