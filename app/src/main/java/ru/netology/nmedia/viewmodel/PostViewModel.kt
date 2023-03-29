@@ -2,6 +2,7 @@ package ru.netology.nmedia.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 //import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.db.AppDbRoom
@@ -43,15 +44,16 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     val data = repository.getAll()
     val edited = MutableLiveData(empty)
-
+    var post:LiveData<Post?>? = null
     fun likeById(id: Long) = repository.likeById(id)
     fun sharedById(id: Long) = repository.sharedById(id)
     fun removeById(id: Long) = repository.removeById(id)
 
-    fun getPost(id: Long): Post? {
-        // TODO: не помнимою как открывать новый пост запросом из базы
-        return data.value?.firstOrNull { it.id == id }
-            ?.copy()
+    fun getPost(id: Long): Post?  {
+        //post.value= repository.getById(id)
+        post = repository.getById(id)
+        return if (post!=null) post!!.value
+        else null
     }
 
     fun cancelEdit() {

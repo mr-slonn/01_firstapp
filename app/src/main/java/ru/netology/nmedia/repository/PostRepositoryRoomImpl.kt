@@ -1,5 +1,6 @@
 package ru.netology.nmedia.repository
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import ru.netology.nmedia.dao.PostDaoRoom
 import ru.netology.nmedia.dto.Post
@@ -14,12 +15,8 @@ class PostRepositoryRoomImpl(
         }
     }
 
-    override fun getById(id: Long): Post? {
-        //TODO: не понимаю как вернуть NULL
-//       val post =  dao.getById(id)
-//        return if (post != null) post.toDto()
-//        else null
-        return  dao.getById(id).toDto()
+    override fun getById(id: Long):LiveData<Post?> {
+         return  dao.getById(id).map { it?.toDto() }
     }
 
     override fun likeById(id: Long) {

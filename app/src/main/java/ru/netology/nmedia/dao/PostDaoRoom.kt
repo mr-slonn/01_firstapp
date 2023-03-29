@@ -12,7 +12,7 @@ interface PostDaoRoom {
     fun getAll(): LiveData<List<PostEntity>>
 
     @Query("SELECT * FROM PostEntity WHERE id = :id")
-    fun getById(id: Long): PostEntity
+    fun getById(id: Long): LiveData<PostEntity?>
 
     @Insert
     fun insert(post: PostEntity)
