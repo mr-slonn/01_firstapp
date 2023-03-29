@@ -31,9 +31,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     // private val repository: PostRepository = PostRepositoryInMemoryImpl()
     // private val repository: PostRepository = PostRepositorySharedPrefsImpl(application)
-
     // private val repository: PostRepository = PostRepositoryFileImpl(application)
-
     // private val repository: PostRepository = PostRepositorySQLiteImpl(
     //      AppDb.getInstance(application).postDao
     // )
