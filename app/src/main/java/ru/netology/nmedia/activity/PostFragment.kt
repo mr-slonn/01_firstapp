@@ -71,85 +71,94 @@ class PostFragment : Fragment() {
 //            ?: throw NullPointerException("Oops! Post is not found")
 
 
-        val post = arguments?.textArg?.toLong()?.let { viewModel.getPost(it) }
+        // val post = arguments?.textArg?.toLong()?.let { viewModel.getPost(it) }
+        arguments?.textArg?.toLong()?.let { viewModel.getPost(it) }
 
-        viewModel.post?.observe(viewLifecycleOwner) { it ->
-            if (it!=null) {
-                binding.cardPost.content.text = it.content
-                binding.cardPost.like.text = Services().countWithSuffix(it.likes)
-                binding.cardPost.share.text = Services().countWithSuffix(it.shared)
-            }
-        }
-        if (post!=null) {
-            binding.cardPost.apply {
-                author.text = post.author
-                published.text = post.published
-                content.text = post.content
-                like.isChecked = post.likedByMe
-                like.text = Services().countWithSuffix(post.likes)
-                share.text = Services().countWithSuffix(post.shared)
-                viewsCount.text = Services().countWithSuffix(post.viewsCount)
+        viewModel.post?.observe(viewLifecycleOwner) { post ->
+            if (post!=null) {
+                binding.cardPost.apply {
+                    author.text = post.author
+                    published.text = post.published
+                    content.text = post.content
+                    like.isChecked = post.likedByMe
+                    like.text = Services().countWithSuffix(post.likes)
+                    share.text = Services().countWithSuffix(post.shared)
+                    viewsCount.text = Services().countWithSuffix(post.viewsCount)
 
-                if (!post.video.isNullOrBlank()) {
-                    videoLayout.visibility = View.VISIBLE
-                    content.visibility = View.GONE
-                } else {
-                    videoLayout.visibility = View.GONE
-                    content.visibility = View.VISIBLE
-                }
-
-                videoLayout.setOnClickListener {
-                    onPlayVideo(post)
-                }
-                videoButton.setOnClickListener {
-                    onPlayVideo(post)
-                }
-
-
-                share.setOnClickListener {
-                    viewModel.sharedById(post.id)
-                    val intent = Intent().apply {
-                        action = Intent.ACTION_SEND
-                        putExtra(Intent.EXTRA_TEXT, post.content)
-                        type = "text/plain"
+                    if (!post.video.isNullOrBlank()) {
+                        videoLayout.visibility = View.VISIBLE
+                        content.visibility = View.GONE
+                    } else {
+                        videoLayout.visibility = View.GONE
+                        content.visibility = View.VISIBLE
                     }
 
-                    val shareIntent =
-                        Intent.createChooser(intent, getString(R.string.chooser_share_post))
-                    startActivity(shareIntent)
-                }
-
-                like.setOnClickListener {
-                    viewModel.likeById(post.id)
-                }
+                    videoLayout.setOnClickListener {
+                        onPlayVideo(post)
+                    }
+                    videoButton.setOnClickListener {
+                        onPlayVideo(post)
+                    }
 
 
-                menu.setOnClickListener {
-                    PopupMenu(it.context, it).apply {
-                        inflate(R.menu.options_post)
-                        setOnMenuItemClickListener { item ->
-                            when (item.itemId) {
-                                R.id.remove -> {
-                                    viewModel.data.removeObservers(viewLifecycleOwner)
-                                    viewModel.removeById(post.id)
-                                    findNavController().navigateUp()
-                                    true
-                                }
-                                R.id.edit -> {
-                                    viewModel.edit(post)
-                                    findNavController().navigate(
-                                        R.id.action_PostFragment_to_newPostFragment2,
-                                        Bundle().apply { textArg = post.content })
-                                    true
-                                }
-
-                                else -> false
-                            }
+                    share.setOnClickListener {
+                        viewModel.sharedById(post.id)
+                        val intent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, post.content)
+                            type = "text/plain"
                         }
-                    }.show()
+
+                        val shareIntent =
+                            Intent.createChooser(intent, getString(R.string.chooser_share_post))
+                        startActivity(shareIntent)
+                    }
+
+                    like.setOnClickListener {
+                        viewModel.likeById(post.id)
+                    }
+
+
+                    menu.setOnClickListener {
+                        PopupMenu(it.context, it).apply {
+                            inflate(R.menu.options_post)
+                            setOnMenuItemClickListener { item ->
+                                when (item.itemId) {
+                                    R.id.remove -> {
+                                        viewModel.data.removeObservers(viewLifecycleOwner)
+                                        viewModel.removeById(post.id)
+                                        //findNavController().navigateUp()
+                                        findNavController().navigate(
+                                            R.id.action_PostFragment_to_feedFragment)
+                                        true
+                                    }
+                                    R.id.edit -> {
+                                        viewModel.edit(post)
+                                        findNavController().navigate(
+                                            R.id.action_PostFragment_to_newPostFragment2,
+                                            Bundle().apply { textArg = post.content })
+                                        true
+                                    }
+
+                                    else -> false
+                                }
+                            }
+                        }.show()
+                    }
                 }
             }
+            else
+            {
+                val actionBar = (activity as AppCompatActivity).supportActionBar
+
+                    actionBar?.setDisplayHomeAsUpEnabled(false)
+                    actionBar?.setDisplayShowHomeEnabled(false)
+                    actionBar?.title = getString(R.string.nmedia)
+                    findNavController().navigateUp()
+
+            }
         }
+
     }
 
 

@@ -49,11 +49,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     fun sharedById(id: Long) = repository.sharedById(id)
     fun removeById(id: Long) = repository.removeById(id)
 
-    fun getPost(id: Long): Post?  {
-        //post.value= repository.getById(id)
+    fun getPost(id: Long)  {
         post = repository.getById(id)
-        return if (post!=null) post!!.value
-        else null
     }
 
     fun cancelEdit() {
