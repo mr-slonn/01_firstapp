@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 
 
 import androidx.fragment.app.Fragment
@@ -40,6 +41,10 @@ class NewPostFragment : Fragment() {
             false
         )
 
+        binding.progress.isVisible = false
+        binding.ok.isEnabled = true
+        binding.edit.isEnabled = true
+
         val text = arguments?.textArg
 
         val actionBar = (activity as AppCompatActivity).supportActionBar
@@ -54,14 +59,30 @@ class NewPostFragment : Fragment() {
 
         actionBar?.setDisplayShowHomeEnabled(true)
         actionBar?.setDisplayHomeAsUpEnabled(true)
-        actionBar?.title = if (text != null) getString(R.string.edit_post) else getString(R.string.add_post)
+        actionBar?.title =
+            if (text != null) getString(R.string.edit_post) else getString(R.string.add_post)
 
         binding.edit.setText(text)
 
         binding.ok.setOnClickListener {
+            actionBar?.setDisplayHomeAsUpEnabled(false)
+            actionBar?.setDisplayShowHomeEnabled(false)
+
+            binding.progress.isVisible = true
+            binding.edit.isEnabled = false
+            binding.ok.isEnabled = false
+
             viewModel.changeContent(binding.edit.text.toString())
             viewModel.save()
             AndroidUtils.hideKeyboard(requireView())
+//            findNavController().navigateUp()
+//            actionBar?.title = getString(R.string.nmedia)
+//            actionBar?.setDisplayHomeAsUpEnabled(false)
+//            actionBar?.setDisplayShowHomeEnabled(false)
+        }
+
+        viewModel.postCreated.observe(viewLifecycleOwner) {
+            viewModel.loadPosts()
             findNavController().navigateUp()
             actionBar?.title = getString(R.string.nmedia)
             actionBar?.setDisplayHomeAsUpEnabled(false)

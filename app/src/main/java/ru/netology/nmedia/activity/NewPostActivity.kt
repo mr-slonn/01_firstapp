@@ -15,11 +15,11 @@ class NewPostActivity : AppCompatActivity() {
         setContentView(binding.root)
 
 
-
         val text = intent.getStringExtra(Intent.EXTRA_TEXT)
 
         supportActionBar?.apply {
-            title = if (text != null) getString(R.string.edit_post) else getString(R.string.add_post)
+            title =
+                if (text != null) getString(R.string.edit_post) else getString(R.string.add_post)
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
 
@@ -28,7 +28,7 @@ class NewPostActivity : AppCompatActivity() {
         if (text != null) {
             binding.edit.setText(text)
             title = getString(R.string.edit_post)
-           // binding.edit.setSelection(text.length)
+            // binding.edit.setSelection(text.length)
         }
 
 
@@ -45,6 +45,7 @@ class NewPostActivity : AppCompatActivity() {
             finish()
         }
     }
+
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return true

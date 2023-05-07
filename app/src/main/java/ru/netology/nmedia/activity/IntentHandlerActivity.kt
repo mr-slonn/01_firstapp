@@ -16,7 +16,7 @@ class IntentHandlerActivity : AppCompatActivity() {
 
         intent?.let {
             if (it.action != Intent.ACTION_SEND) {
-               return@let
+                return@let
             }
 
             val text = it.getStringExtra(Intent.EXTRA_TEXT)

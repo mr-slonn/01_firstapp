@@ -8,6 +8,6 @@ data class Post(
     var likedByMe: Boolean = false,
     var likes: Int = 0,
     var shared: Int = 0,
-    var viewsCount: Int =0,
-    var video: String ? = null,
-    )
+    var viewsCount: Int = 0,
+    var video: String? = null,
+)

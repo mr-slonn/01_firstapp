@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import ru.netology.nmedia.R
@@ -29,6 +31,11 @@ class FeedFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+        val actionBar = (activity as AppCompatActivity).supportActionBar
+        actionBar?.setDisplayShowHomeEnabled(false)
+        actionBar?.setDisplayHomeAsUpEnabled(false)
+
         val binding = FragmentFeedBinding.inflate(
             inflater,
             container,
@@ -37,12 +44,16 @@ class FeedFragment : Fragment() {
 
         val adapter = PostsAdapter(object : OnInteractionListener {
             override fun onEdit(post: Post) {
-              viewModel.edit(post)
-              //  findNavController().navigate(R.id.action_feedFragment_to_newPostFragment, Bundle().apply { textArg = post.content })
+                viewModel.edit(post)
+                //  findNavController().navigate(R.id.action_feedFragment_to_newPostFragment, Bundle().apply { textArg = post.content })
             }
 
             override fun onLike(post: Post) {
-                viewModel.likeById(post.id)
+                if (post.likedByMe) {
+                    viewModel.unLikeById(post.id)
+                } else {
+                    viewModel.likeById(post.id)
+                }
             }
 
             override fun onRemove(post: Post) {
@@ -71,12 +82,30 @@ class FeedFragment : Fragment() {
 
             override fun onViewPost(post: Post) {
 
-                findNavController().navigate(R.id.action_feedFragment_to_PostFragment, Bundle().apply { textArg = post.id.toString() })
+                findNavController().navigate(
+                    R.id.action_feedFragment_to_PostFragment,
+                    Bundle().apply { textArg = post.id.toString() })
             }
         })
         binding.list.adapter = adapter
-        viewModel.data.observe(viewLifecycleOwner) { posts ->
-            adapter.submitList(posts)
+
+        viewModel.data.observe(viewLifecycleOwner) { state ->
+            adapter.submitList(state.posts)
+            if (binding.swipeRefreshLayout.isRefreshing) {
+                binding.progress.isVisible = false
+                binding.swipeRefreshLayout.isRefreshing = state.loading
+            } else {
+                binding.progress.isVisible = state.loading
+
+            }
+            binding.errorGroup.isVisible = state.error
+            binding.emptyText.isVisible = state.empty
+
+
+        }
+
+        binding.retryButton.setOnClickListener {
+            viewModel.loadPosts()
         }
 
 
@@ -87,8 +116,14 @@ class FeedFragment : Fragment() {
 
         viewModel.edited.observe(viewLifecycleOwner) { post ->
             if (post.id != 0L) {
-                findNavController().navigate(R.id.action_feedFragment_to_newPostFragment, Bundle().apply { textArg = post.content })
+                findNavController().navigate(
+                    R.id.action_feedFragment_to_newPostFragment,
+                    Bundle().apply { textArg = post.content })
             }
+        }
+
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.loadPosts()
 
         }
 

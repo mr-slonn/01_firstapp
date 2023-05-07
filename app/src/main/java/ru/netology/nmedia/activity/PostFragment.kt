@@ -4,12 +4,14 @@ package ru.netology.nmedia.activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+//import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -53,6 +55,9 @@ class PostFragment : Fragment() {
             actionBar?.setDisplayHomeAsUpEnabled(false)
             actionBar?.setDisplayShowHomeEnabled(false)
             actionBar?.title = getString(R.string.nmedia)
+            binding.cardPostScroll.visibility = View.GONE
+            viewModel.loadPosts()
+            viewModel.backPost()
             findNavController().navigateUp()
         }
         actionBar?.setDisplayShowHomeEnabled(true)
@@ -64,6 +69,7 @@ class PostFragment : Fragment() {
     private val binding: FragmentPostBinding
         get() = _binding!!
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -74,18 +80,25 @@ class PostFragment : Fragment() {
         // val post = arguments?.textArg?.toLong()?.let { viewModel.getPost(it) }
         arguments?.textArg?.toLong()?.let { viewModel.getPost(it) }
 
-        viewModel.post?.observe(viewLifecycleOwner) { post ->
-            if (post!=null) {
-                binding.cardPost.apply {
-                    author.text = post.author
-                    published.text = post.published
-                    content.text = post.content
-                    like.isChecked = post.likedByMe
-                    like.text = Services().countWithSuffix(post.likes)
-                    share.text = Services().countWithSuffix(post.shared)
-                    viewsCount.text = Services().countWithSuffix(post.viewsCount)
+        viewModel.post.observe(viewLifecycleOwner) { state ->
 
-                    if (!post.video.isNullOrBlank()) {
+            binding.progress.isVisible = state.loading
+            binding.errorGroup.isVisible = state.error
+            binding.emptyText.isVisible = state.empty
+            if (state.post != null) {
+
+                binding.cardPostScroll.visibility = View.VISIBLE
+
+                binding.cardPost.apply {
+                    author.text = state.post.author
+                    published.text = state.post.published
+                    content.text = state.post.content
+                    like.isChecked = state.post.likedByMe
+                    like.text = Services().countWithSuffix(state.post.likes)
+                    share.text = Services().countWithSuffix(state.post.shared)
+                    viewsCount.text = Services().countWithSuffix(state.post.viewsCount)
+
+                    if (!state.post.video.isNullOrBlank()) {
                         videoLayout.visibility = View.VISIBLE
                         content.visibility = View.GONE
                     } else {
@@ -94,18 +107,17 @@ class PostFragment : Fragment() {
                     }
 
                     videoLayout.setOnClickListener {
-                        onPlayVideo(post)
+                        onPlayVideo(state.post)
                     }
                     videoButton.setOnClickListener {
-                        onPlayVideo(post)
+                        onPlayVideo(state.post)
                     }
 
-
                     share.setOnClickListener {
-                        viewModel.sharedById(post.id)
+                        viewModel.sharedById(state.post.id)
                         val intent = Intent().apply {
                             action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT, post.content)
+                            putExtra(Intent.EXTRA_TEXT, state.post.content)
                             type = "text/plain"
                         }
 
@@ -115,9 +127,12 @@ class PostFragment : Fragment() {
                     }
 
                     like.setOnClickListener {
-                        viewModel.likeById(post.id)
+                        if (state.post.likedByMe) {
+                            viewModel.unLikeByIdFromPost(state.post.id)
+                        } else {
+                            viewModel.likeByIdFromPost(state.post.id)
+                        }
                     }
-
 
                     menu.setOnClickListener {
                         PopupMenu(it.context, it).apply {
@@ -125,18 +140,19 @@ class PostFragment : Fragment() {
                             setOnMenuItemClickListener { item ->
                                 when (item.itemId) {
                                     R.id.remove -> {
-                                        viewModel.data.removeObservers(viewLifecycleOwner)
-                                        viewModel.removeById(post.id)
+                                        viewModel.post.removeObservers(viewLifecycleOwner)
+                                        viewModel.removeById(state.post.id)
                                         //findNavController().navigateUp()
                                         findNavController().navigate(
-                                            R.id.action_PostFragment_to_feedFragment)
+                                            R.id.action_PostFragment_to_feedFragment
+                                        )
                                         true
                                     }
                                     R.id.edit -> {
-                                        viewModel.edit(post)
+                                        viewModel.edit(state.post)
                                         findNavController().navigate(
                                             R.id.action_PostFragment_to_newPostFragment2,
-                                            Bundle().apply { textArg = post.content })
+                                            Bundle().apply { textArg = state.post.content })
                                         true
                                     }
 
@@ -145,18 +161,10 @@ class PostFragment : Fragment() {
                             }
                         }.show()
                     }
+
                 }
             }
-            else
-            {
-                val actionBar = (activity as AppCompatActivity).supportActionBar
 
-                    actionBar?.setDisplayHomeAsUpEnabled(false)
-                    actionBar?.setDisplayShowHomeEnabled(false)
-                    actionBar?.title = getString(R.string.nmedia)
-                    findNavController().navigateUp()
-
-            }
         }
 
     }

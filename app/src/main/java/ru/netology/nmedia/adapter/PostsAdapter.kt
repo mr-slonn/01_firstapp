@@ -30,13 +30,13 @@ class PostsAdapter(
         val binding = CardPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return PostViewHolder(binding, onInteractionListener)
     }
+
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val post = getItem(position)
         holder.bind(post)
     }
 
 }
-
 
 
 class PostViewHolder(
@@ -57,9 +57,7 @@ class PostViewHolder(
             if (!post.video.isNullOrBlank()) {
                 videoLayout.visibility = View.VISIBLE
                 content.visibility = View.GONE
-            }
-            else
-            {
+            } else {
                 videoLayout.visibility = View.GONE
                 content.visibility = View.VISIBLE
             }
