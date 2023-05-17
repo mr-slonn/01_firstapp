@@ -127,11 +127,14 @@ class PostFragment : Fragment() {
                     }
 
                     like.setOnClickListener {
-                        if (state.post.likedByMe) {
-                            viewModel.unLikeByIdFromPost(state.post.id)
-                        } else {
-                            viewModel.likeByIdFromPost(state.post.id)
-                        }
+//                        if (state.post.likedByMe) {
+//                            viewModel.unLikeByIdFromPost(state.post.id)
+//                        } else {
+//                            viewModel.likeByIdFromPost(state.post.id)
+//                        }
+
+                        viewModel.likeByIdFromPostV2()
+
                     }
 
                     menu.setOnClickListener {
@@ -148,6 +151,7 @@ class PostFragment : Fragment() {
                                         )
                                         true
                                     }
+
                                     R.id.edit -> {
                                         viewModel.edit(state.post)
                                         findNavController().navigate(
