@@ -9,7 +9,12 @@
       "likedByMe": true,
       "likes": 100,
       "share": "1.5K",
-      "video":"https://youtu.be/hcnFHnwdqOs"
+      "video":"https://youtu.be/hcnFHnwdqOs",
+      "attachment": {
+        "url": "@sample/podcast.jpg",
+        "type": "IMAGE",
+        "description": "@sample/podcast.jpg"
+      }
     }
   ]
 }

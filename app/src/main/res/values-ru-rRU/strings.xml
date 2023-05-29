@@ -28,4 +28,5 @@
     <string name="empty_posts">Пока нет никаких постов.\nесли вы создадите новую запись, она появится здесь</string>
     <string name="error_loading">Что-то пошло не так. Попробуйте еще раз позже</string>
     <string name="network_error">Ошибка сети</string>
+    <string name="description_attachment">Вложение</string>
 </resources>

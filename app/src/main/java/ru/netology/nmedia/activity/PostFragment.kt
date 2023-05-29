@@ -20,6 +20,8 @@ import ru.netology.nmedia.databinding.FragmentPostBinding
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.services.Services
 import ru.netology.nmedia.util.StringArg
+import ru.netology.nmedia.util.loadAttachment
+import ru.netology.nmedia.util.loadAvatar
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 
@@ -97,6 +99,21 @@ class PostFragment : Fragment() {
                     like.text = Services().countWithSuffix(state.post.likes)
                     share.text = Services().countWithSuffix(state.post.shared)
                     viewsCount.text = Services().countWithSuffix(state.post.viewsCount)
+
+                    if (state.post.authorAvatar != null) {
+                        //    avatar.loadAvatar(viewModel.getAvatarUrl(state.post.authorAvatar))
+                        avatar.loadAvatar(state.post.authorAvatar)
+                    }
+
+                    if (state.post.attachment != null) {
+                        //     attachment.loadAttachment(viewModel.getAttachmentUrl(state.post.attachment.url))
+                        attachment.loadAttachment(state.post.attachment.url)
+                        attachment.visibility = View.VISIBLE
+                    } else {
+                        attachment.visibility = View.GONE
+                    }
+
+
 
                     if (!state.post.video.isNullOrBlank()) {
                         videoLayout.visibility = View.VISIBLE

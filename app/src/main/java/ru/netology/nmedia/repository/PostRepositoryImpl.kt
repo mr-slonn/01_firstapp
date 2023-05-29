@@ -192,6 +192,14 @@ class PostRepositoryImpl : PostRepository {
 //            .close()
 //    }
 
+    override fun getAttachmentUrl(fileName: String): String {
+        return "${BASE_URL}/images/$fileName"
+    }
+
+    override fun getAvatarUrl(fileName: String): String {
+        return "${BASE_URL}/avatars/$fileName"
+    }
+
     override fun save(post: Post, callback: PostRepository.PostsCallback<Post>) {
         val request: Request = Request.Builder()
             .post(gson.toJson(post).toRequestBody(jsonType))

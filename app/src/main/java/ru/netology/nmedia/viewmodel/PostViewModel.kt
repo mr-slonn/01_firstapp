@@ -5,6 +5,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+//import okhttp3.internal.concurrent.TaskRunner.Companion.logger
 //import ru.netology.nmedia.db.AppDb
 //import ru.netology.nmedia.db.AppDbRoom
 import ru.netology.nmedia.dto.Post
@@ -54,6 +55,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     private val _data = MutableLiveData(FeedModel())
     val data: LiveData<FeedModel>
         get() = _data
+
     val edited = MutableLiveData(empty)
     private val _postCreated = SingleLiveEvent<Unit>()
     val postCreated: LiveData<Unit>
@@ -91,6 +93,24 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         _data.value = FeedModel(loading = true)
         repository.getAll(object : PostRepository.PostsCallback<List<Post>> {
             override fun onSuccess(posts: List<Post>) {
+//                var postsImg=  posts.map {
+//
+//                    if (it.attachment == null) it else it.copy(
+//                        attachment = it.attachment.copy(
+//                            url = repository.getAttachmentUrl(
+//                                it.attachment.url
+//                            )
+//                        )
+//                    )
+//                 }
+//
+//                postsImg =  postsImg.map {
+//                    if (it.authorAvatar == null) it else it.copy(
+//                        authorAvatar = repository.getAvatarUrl(
+//                            it.authorAvatar
+//                        )
+//                    )
+//                }
                 _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
             }
 
@@ -336,6 +356,10 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun sharedById(id: Long) = repository.sharedById(id)
+
+    fun getAttachmentUrl(fileName: String) = repository.getAttachmentUrl(fileName)
+
+    fun getAvatarUrl(fileName: String) = repository.getAvatarUrl(fileName)
 
     // fun removeById(id: Long) = repository.removeById(id)
     fun removeById(id: Long) {

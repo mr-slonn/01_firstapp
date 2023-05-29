@@ -11,6 +11,8 @@ import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.services.Services
+import ru.netology.nmedia.util.loadAttachment
+import ru.netology.nmedia.util.loadAvatar
 
 interface OnInteractionListener {
     fun onLike(post: Post) {}
@@ -53,6 +55,20 @@ class PostViewHolder(
             like.text = Services().countWithSuffix(post.likes)
             like.isChecked = post.likedByMe
             viewsCount.text = Services().countWithSuffix(post.viewsCount)
+
+
+            if (post.authorAvatar != null) {
+                avatar.loadAvatar(post.authorAvatar)
+            }
+
+            if (post.attachment != null) {
+                attachment.loadAttachment(post.attachment.url)
+                attachment.visibility = View.VISIBLE
+            } else {
+                attachment.visibility = View.GONE
+            }
+
+
 
             if (!post.video.isNullOrBlank()) {
                 videoLayout.visibility = View.VISIBLE

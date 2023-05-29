@@ -68,24 +68,42 @@
         app:barrierDirection="bottom"
         app:constraint_referenced_ids="avatar, published , menu" />
 
-    <TextView
-        android:id="@+id/content"
-        android:layout_width="0dp"
+
+    <LinearLayout
+        android:id="@+id/contentLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/common_spacing"
-        android:autoLink="web"
-        android:visibility="visible"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/barrier"
-        tools:text="@sample/posts.json/data/content" />
+        app:layout_constraintTop_toBottomOf="@id/barrier">
+
+        <TextView
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/common_spacing"
+            android:autoLink="web"
+            android:visibility="visible"
+            tools:text="@sample/posts.json/data/content" />
+
+        <ImageView
+            android:id="@+id/attachment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/common_spacing"
+            android:contentDescription="@string/description_attachment"
+            android:visibility="gone"
+            tools:srcCompat="@sample/posts.json/data/attachment/url" />
+
+    </LinearLayout>
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrierAfterPost"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="content" />
+        app:constraint_referenced_ids="contentLayout" />
 
     <FrameLayout
         android:id="@+id/videoLayout"
@@ -102,7 +120,7 @@
             android:layout_height="wrap_content"
             android:contentDescription="@string/video"
             android:src="@drawable/video"
-            tools:srcCompat="@sample/video.png"/>
+            tools:srcCompat="@sample/video.png" />
 
 
         <ImageView

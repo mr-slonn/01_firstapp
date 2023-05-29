@@ -15,6 +15,8 @@ interface PostRepository {
     fun sharedById(id: Long)
     fun removeById(id: Long, callback: PostsCallback<String>)
     fun save(post: Post, callback: PostsCallback<Post>)
+    fun getAttachmentUrl(fileName: String): String
+    fun getAvatarUrl(fileName: String): String
 
     interface PostsCallback<T> {
         fun onSuccess(data: T) {}
