@@ -48,7 +48,7 @@ class PostViewHolder(
     fun bind(post: Post) {
         binding.apply {
             author.text = post.author
-            published.text = post.published
+            published.text = Services().getDateTime(post.published)
             content.text = post.content
 
             share.text = Services().countWithSuffix(post.shared)

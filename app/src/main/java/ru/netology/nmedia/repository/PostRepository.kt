@@ -13,7 +13,7 @@ interface PostRepository {
     fun likeById(id: Long, callback: PostsCallback<Post>)
     fun unLikeById(id: Long, callback: PostsCallback<Post>)
     fun sharedById(id: Long)
-    fun removeById(id: Long, callback: PostsCallback<String>)
+    fun removeById(id: Long, callback: PostsCallback<Unit>)
     fun save(post: Post, callback: PostsCallback<Post>)
     fun getAttachmentUrl(fileName: String): String
     fun getAvatarUrl(fileName: String): String

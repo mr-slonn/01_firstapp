@@ -92,7 +92,10 @@ class PostFragment : Fragment() {
                 binding.cardPostScroll.visibility = View.VISIBLE
 
                 binding.cardPost.apply {
+
+
                     author.text = state.post.author
+
                     published.text = state.post.published
                     content.text = state.post.content
                     like.isChecked = state.post.likedByMe

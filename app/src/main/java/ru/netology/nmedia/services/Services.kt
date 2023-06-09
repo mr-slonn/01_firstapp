@@ -2,6 +2,9 @@ package ru.netology.nmedia.services
 
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlin.math.ln
 import kotlin.math.pow
 
@@ -21,6 +24,17 @@ class Services {
                 formatter.format(preFormat) + suffixChars[exp - 1]
             }
         }
+    }
+
+     fun getDateTime(s: String): String? {
+         return try {
+             val sdf = SimpleDateFormat("dd MMMM yyyy",
+                 Locale.getDefault())
+             val netDate = Date(s.toLong() * 1000)
+             sdf.format(netDate)
+         } catch (e: Exception) {
+             e.toString()
+         }
     }
 
 

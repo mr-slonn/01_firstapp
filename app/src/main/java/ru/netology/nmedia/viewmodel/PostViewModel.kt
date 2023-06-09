@@ -129,16 +129,16 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     // fun likeById(id: Long) = repository.likeById(id)
     fun likeById(id: Long) {
 
-        _data.postValue(
-            _data.value?.copy(posts = _data.value?.posts.orEmpty()
-                .map {
-                    if (it.id != id) it else it.copy(
-                        likedByMe = !it.likedByMe,
-                        likes = if (it.likedByMe) it.likes - 1 else it.likes + 1
-                    )
-                }
-            )
-        )
+//        _data.postValue(
+//            _data.value?.copy(posts = _data.value?.posts.orEmpty()
+//                .map {
+//                    if (it.id != id) it else it.copy(
+//                        likedByMe = !it.likedByMe,
+//                        likes = if (it.likedByMe) it.likes - 1 else it.likes + 1
+//                    )
+//                }
+//            )
+//        )
 
 //        thread {
 //            val post = repository.likeById(id)
@@ -170,16 +170,16 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun likeByIdV2(post: Post) {
 
-        _data.postValue(
-            _data.value?.copy(posts = _data.value?.posts.orEmpty()
-                .map {
-                    if (it.id != post.id) it else it.copy(
-                        likedByMe = !it.likedByMe,
-                        likes = if (it.likedByMe) it.likes - 1 else it.likes + 1
-                    )
-                }
-            )
-        )
+//        _data.postValue(
+//            _data.value?.copy(posts = _data.value?.posts.orEmpty()
+//                .map {
+//                    if (it.id != post.id) it else it.copy(
+//                        likedByMe = !it.likedByMe,
+//                        likes = if (it.likedByMe) it.likes - 1 else it.likes + 1
+//                    )
+//                }
+//            )
+//        )
 
         if (!post.likedByMe) {
             repository.likeById(post.id, object : PostRepository.PostsCallback<Post> {
@@ -187,7 +187,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                     _data.postValue(
                         _data.value?.copy(posts = _data.value?.posts.orEmpty()
                             .map {
-                                if (it.id != newpost.id) it else post
+                                if (it.id != newpost.id) it else newpost
                             }
                         )
                     )
@@ -203,7 +203,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                     _data.postValue(
                         _data.value?.copy(posts = _data.value?.posts.orEmpty()
                             .map {
-                                if (it.id != newpost.id) it else post
+                                if (it.id != newpost.id) it else newpost
                             }
                         )
                     )
@@ -218,16 +218,16 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun unLikeById(id: Long) {
 
-        _data.postValue(
-            _data.value?.copy(posts = _data.value?.posts.orEmpty()
-                .map {
-                    if (it.id != id) it else it.copy(
-                        likedByMe = !it.likedByMe,
-                        likes = if (it.likedByMe) it.likes - 1 else it.likes + 1
-                    )
-                }
-            )
-        )
+//        _data.postValue(
+//            _data.value?.copy(posts = _data.value?.posts.orEmpty()
+//                .map {
+//                    if (it.id != id) it else it.copy(
+//                        likedByMe = !it.likedByMe,
+//                        likes = if (it.likedByMe) it.likes - 1 else it.likes + 1
+//                    )
+//                }
+//            )
+//        )
 
 //        thread {
 //            val post = repository.unLikeById(id)
@@ -258,14 +258,14 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun likeByIdFromPost(id: Long) {
-        _post.postValue(
-            _post.value?.copy(
-                post = _post.value?.post?.copy(
-                    likedByMe = !_post.value?.post!!.likedByMe,
-                    likes = if (_post.value?.post!!.likedByMe) _post.value?.post!!.likes - 1 else _post.value?.post!!.likes + 1
-                )
-            )
-        )
+//        _post.postValue(
+//            _post.value?.copy(
+//                post = _post.value?.post?.copy(
+//                    likedByMe = !_post.value?.post!!.likedByMe,
+//                    likes = if (_post.value?.post!!.likedByMe) _post.value?.post!!.likes - 1 else _post.value?.post!!.likes + 1
+//                )
+//            )
+//        )
 //        thread {
 //            val post = repository.likeById(id)
 //            _post.postValue(
@@ -288,14 +288,14 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun likeByIdFromPostV2() {
 
-        _post.postValue(
-            _post.value?.copy(
-                post = _post.value?.post?.copy(
-                    likedByMe = !_post.value?.post!!.likedByMe,
-                    likes = if (_post.value?.post!!.likedByMe) _post.value?.post!!.likes - 1 else _post.value?.post!!.likes + 1
-                )
-            )
-        )
+//        _post.postValue(
+//            _post.value?.copy(
+//                post = _post.value?.post?.copy(
+//                    likedByMe = !_post.value?.post!!.likedByMe,
+//                    likes = if (_post.value?.post!!.likedByMe) _post.value?.post!!.likes - 1 else _post.value?.post!!.likes + 1
+//                )
+//            )
+//        )
 
         _post.value?.post?.let {
             if (!it.likedByMe) {
@@ -327,14 +327,14 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun unLikeByIdFromPost(id: Long) {
-        _post.postValue(
-            _post.value?.copy(
-                post = _post.value?.post?.copy(
-                    likedByMe = !_post.value?.post!!.likedByMe,
-                    likes = if (_post.value?.post!!.likedByMe) _post.value?.post!!.likes - 1 else _post.value?.post!!.likes + 1
-                )
-            )
-        )
+//        _post.postValue(
+//            _post.value?.copy(
+//                post = _post.value?.post?.copy(
+//                    likedByMe = !_post.value?.post!!.likedByMe,
+//                    likes = if (_post.value?.post!!.likedByMe) _post.value?.post!!.likes - 1 else _post.value?.post!!.likes + 1
+//                )
+//            )
+//        )
 //        thread {
 //            val post = repository.unLikeById(id)
 //            _post.postValue(
@@ -385,7 +385,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             )
         )
 
-        repository.removeById(id, object : PostRepository.PostsCallback<String> {
+        repository.removeById(id, object : PostRepository.PostsCallback<Unit> {
             //            override fun onSuccess(data: String) {
 //                // TODO: Тут же что то надо?
 //            }
@@ -410,7 +410,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 //            }.also(_post::postValue) // в вебинаре .let
 //        }
 
-        _post.postValue(PostModel(loading = true))
+        _post.postValue(PostModel(loading = true, post = null ))
 
         repository.getById(id, object : PostRepository.PostsCallback<Post?> {
             override fun onSuccess(post: Post?) {
