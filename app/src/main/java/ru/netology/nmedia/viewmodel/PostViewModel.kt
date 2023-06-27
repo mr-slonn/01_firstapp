@@ -58,8 +58,12 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     val edited = MutableLiveData(empty)
     private val _postCreated = SingleLiveEvent<Unit>()
+    private val _postNotCreated = SingleLiveEvent<Unit>()
     val postCreated: LiveData<Unit>
         get() = _postCreated
+
+    val postNotCreated: LiveData<Unit>
+        get() = _postNotCreated
 
     private val _post = SingleLiveEvent<PostModel>()
     val post: LiveData<PostModel>
@@ -127,46 +131,46 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     // вебинаре по другому
     // fun likeById(id: Long) = repository.likeById(id)
-    fun likeById(id: Long) {
-
-//        _data.postValue(
-//            _data.value?.copy(posts = _data.value?.posts.orEmpty()
-//                .map {
-//                    if (it.id != id) it else it.copy(
-//                        likedByMe = !it.likedByMe,
-//                        likes = if (it.likedByMe) it.likes - 1 else it.likes + 1
+//    fun likeById(id: Long) {
+//
+////        _data.postValue(
+////            _data.value?.copy(posts = _data.value?.posts.orEmpty()
+////                .map {
+////                    if (it.id != id) it else it.copy(
+////                        likedByMe = !it.likedByMe,
+////                        likes = if (it.likedByMe) it.likes - 1 else it.likes + 1
+////                    )
+////                }
+////            )
+////        )
+//
+////        thread {
+////            val post = repository.likeById(id)
+////            _data.postValue(
+////                _data.value?.copy(posts = _data.value?.posts.orEmpty()
+////                    .map {
+////                        if (it.id != id) it else post
+////                    }
+////                )
+////            )
+////        }
+//
+//        repository.likeById(id, object : PostRepository.PostsCallback<Post> {
+//            override fun onSuccess(post: Post) {
+//                _data.postValue(
+//                    _data.value?.copy(posts = _data.value?.posts.orEmpty()
+//                        .map {
+//                            if (it.id != id) it else post
+//                        }
 //                    )
-//                }
-//            )
-//        )
-
-//        thread {
-//            val post = repository.likeById(id)
-//            _data.postValue(
-//                _data.value?.copy(posts = _data.value?.posts.orEmpty()
-//                    .map {
-//                        if (it.id != id) it else post
-//                    }
 //                )
-//            )
-//        }
-
-        repository.likeById(id, object : PostRepository.PostsCallback<Post> {
-            override fun onSuccess(post: Post) {
-                _data.postValue(
-                    _data.value?.copy(posts = _data.value?.posts.orEmpty()
-                        .map {
-                            if (it.id != id) it else post
-                        }
-                    )
-                )
-            }
-
-            override fun onError(e: Exception) {
-                _data.postValue(FeedModel(error = true))
-            }
-        })
-    }
+//            }
+//
+//            override fun onError(e: Exception) {
+//                _data.postValue(FeedModel(error = true))
+//            }
+//        })
+//    }
 
     fun likeByIdV2(post: Post) {
 
@@ -188,13 +192,21 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                         _data.value?.copy(posts = _data.value?.posts.orEmpty()
                             .map {
                                 if (it.id != newpost.id) it else newpost
-                            }
+                            }, smallError = false
                         )
+
                     )
                 }
 
                 override fun onError(e: Exception) {
-                    _data.postValue(FeedModel(error = true))
+                    // _data.postValue(FeedModel(smallError = true))
+//                    _data.postValue(
+//                        _data.value?.copy(posts = _data.value?.posts.orEmpty(),smallError = true)
+//                    )
+                    _data.postValue(
+                        _data.value?.copy(smallError = true)
+                    )
+                    //   _data.postValue(FeedModel(posts = _data.value?.posts.orEmpty(), empty = _data.value?.posts.orEmpty().isEmpty(), smallError = true))
                 }
             })
         } else {
@@ -204,13 +216,22 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                         _data.value?.copy(posts = _data.value?.posts.orEmpty()
                             .map {
                                 if (it.id != newpost.id) it else newpost
-                            }
+                            }, smallError = false
                         )
                     )
                 }
 
                 override fun onError(e: Exception) {
-                    _data.postValue(FeedModel(error = true))
+                    //_data.postValue(FeedModel(error = true))
+//                    _data.postValue(
+//                        _data.value?.copy(posts = _data.value?.posts.orEmpty(), smallError = true)
+//                    )
+
+                    _data.postValue(
+                        _data.value?.copy(smallError = true)
+                    )
+
+                    // _data.postValue(FeedModel(posts = _data.value?.posts.orEmpty(), empty = _data.value?.posts.orEmpty().isEmpty(), smallError = true))
                 }
             })
         }
@@ -302,24 +323,30 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 repository.likeById(it.id, object : PostRepository.PostsCallback<Post> {
                     override fun onSuccess(post: Post) {
                         _post.postValue(
-                            _post.value?.copy(post = post)
+                            _post.value?.copy(post = post, smallError = false)
                         )
                     }
 
                     override fun onError(e: Exception) {
-                        _data.postValue(FeedModel(error = true))
+                        // _post.postValue(FeedModel(error = true))
+                        _post.postValue(
+                            _post.value?.copy(smallError = true)
+                        )
                     }
                 })
             } else {
                 repository.unLikeById(it.id, object : PostRepository.PostsCallback<Post> {
                     override fun onSuccess(post: Post) {
                         _post.postValue(
-                            _post.value?.copy(post = post)
+                            _post.value?.copy(post = post, smallError = false)
                         )
                     }
 
                     override fun onError(e: Exception) {
-                        _data.postValue(FeedModel(error = true))
+                        //  _data.postValue(FeedModel(error = true))
+                        _post.postValue(
+                            _post.value?.copy(smallError = true)
+                        )
                     }
                 })
             }
@@ -378,19 +405,26 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 //            }
 //        }
 
-        val old = _data.value?.posts.orEmpty()
-        _data.postValue(
-            _data.value?.copy(posts = _data.value?.posts.orEmpty()
-                .filter { it.id != id }
-            )
-        )
+        //val old = _data.value?.posts.orEmpty()
+
 
         repository.removeById(id, object : PostRepository.PostsCallback<Unit> {
             //            override fun onSuccess(data: String) {
 //                // TODO: Тут же что то надо?
 //            }
+
+            override fun onSuccess(data: Unit) {
+                _data.postValue(
+                    _data.value?.copy(
+                        posts = _data.value?.posts.orEmpty()
+                            .filter { it.id != id }, smallError = false
+                    )
+                )
+            }
+
             override fun onError(e: Exception) {
-                _data.postValue(_data.value?.copy(posts = old))
+                //  _data.postValue(_data.value?.copy(posts = old, smallError = true))
+                _data.postValue(_data.value?.copy(smallError = true))
             }
         })
     }
@@ -410,7 +444,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 //            }.also(_post::postValue) // в вебинаре .let
 //        }
 
-        _post.postValue(PostModel(loading = true, post = null ))
+        _post.postValue(PostModel(loading = true, post = null))
 
         repository.getById(id, object : PostRepository.PostsCallback<Post?> {
             override fun onSuccess(post: Post?) {
@@ -451,7 +485,14 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 override fun onError(e: Exception) {
-                    //TODO: Сделать возврат (сообщение) об ошибки.
+
+                    //edited.postValue(edited.value)
+                    _postNotCreated.postValue(Unit)
+
+                    // _post.postValue(PostModel(smallError = true))
+//                    _data.postValue(
+//                        _data.value?.copy(smallError = true)
+//                    )
                 }
             })
 
@@ -471,6 +512,4 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         }
         edited.value = edited.value?.copy(content = text)
     }
-
-
 }

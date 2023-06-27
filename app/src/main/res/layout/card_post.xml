@@ -84,22 +84,21 @@
 
     <ImageView
         android:id="@+id/attachment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="380dp"
+        android:layout_height="254dp"
         android:layout_marginTop="@dimen/common_spacing"
 
-
-
-        android:contentDescription="@string/description_attachment"
         android:adjustViewBounds="true"
+        android:contentDescription="@string/description_attachment"
 
-        android:visibility="visible"
-        tools:srcCompat="@sample/posts.json/data/attachment/url"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/barrierAfterPost"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.531"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/content"
-        />
+        app:layout_constraintVertical_bias="0.0"
+        tools:srcCompat="@sample/posts.json/data/attachment/url" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrierAfterPost"

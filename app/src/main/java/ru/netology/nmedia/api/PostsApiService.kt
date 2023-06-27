@@ -10,7 +10,7 @@ import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.dto.Post
 
 
-private const val BASE_URL = "${BuildConfig.BASE_URL}/api/slow/"
+private const val BASE_URL = "${BuildConfig.BASE_URL}/api${BuildConfig.SPEED}/"
 
 private val logging = HttpLoggingInterceptor().apply {
     if (BuildConfig.DEBUG) {
@@ -51,7 +51,7 @@ interface PostsApiService {
         return "${BASE_URL}/images/$fileName"
     }
 
-     fun getAvatarUrl(fileName: String): String {
+    fun getAvatarUrl(fileName: String): String {
         return "${BASE_URL}/avatars/$fileName"
     }
 }

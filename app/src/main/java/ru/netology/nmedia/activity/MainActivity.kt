@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onLike(post: Post) {
-                viewModel.likeById(post.id)
+                viewModel.likeByIdV2(post)
             }
 
             override fun onShare(post: Post) {

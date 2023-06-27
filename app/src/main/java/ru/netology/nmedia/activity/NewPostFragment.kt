@@ -10,6 +10,8 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
 
 
@@ -64,6 +66,8 @@ class NewPostFragment : Fragment() {
 
         binding.edit.setText(text)
 
+
+
         binding.ok.setOnClickListener {
             actionBar?.setDisplayHomeAsUpEnabled(false)
             actionBar?.setDisplayShowHomeEnabled(false)
@@ -79,6 +83,25 @@ class NewPostFragment : Fragment() {
 //            actionBar?.title = getString(R.string.nmedia)
 //            actionBar?.setDisplayHomeAsUpEnabled(false)
 //            actionBar?.setDisplayShowHomeEnabled(false)
+        }
+
+        viewModel.postNotCreated.observe(viewLifecycleOwner) {
+
+            actionBar?.setDisplayHomeAsUpEnabled(true)
+            actionBar?.setDisplayShowHomeEnabled(true)
+
+            binding.progress.isVisible = false
+            binding.edit.isEnabled = true
+            binding.ok.isEnabled = true
+
+            Snackbar.make(
+                binding.root,
+                R.string.error_loading,
+                BaseTransientBottomBar.LENGTH_INDEFINITE
+            ).setAction(android.R.string.cancel)
+            {
+
+            }.show()
         }
 
         viewModel.postCreated.observe(viewLifecycleOwner) {

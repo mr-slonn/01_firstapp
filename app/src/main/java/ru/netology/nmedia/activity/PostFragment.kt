@@ -15,6 +15,8 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentPostBinding
 import ru.netology.nmedia.dto.Post
@@ -87,6 +89,26 @@ class PostFragment : Fragment() {
             binding.progress.isVisible = state.loading
             binding.errorGroup.isVisible = state.error
             binding.emptyText.isVisible = state.empty
+
+            if (binding.errorGroup.isVisible) {
+                binding.retryButton.setOnClickListener {
+                    arguments?.textArg?.toLong()?.let { viewModel.getPost(it) }
+                }
+            }
+
+            if (state.smallError) {
+                Snackbar.make(
+                    binding.root,
+                    R.string.error_loading,
+                    BaseTransientBottomBar.LENGTH_INDEFINITE
+                ).setAction(android.R.string.cancel)
+                {
+
+                }.show()
+            }
+
+
+
             if (state.post != null) {
 
                 binding.cardPostScroll.visibility = View.VISIBLE

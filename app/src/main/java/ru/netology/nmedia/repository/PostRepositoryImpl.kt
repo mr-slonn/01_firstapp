@@ -43,7 +43,7 @@ class PostRepositoryImpl : PostRepository {
     }
 
     override fun save(post: Post, callback: PostRepository.PostsCallback<Post>) {
-       // PostsApi.retrofitService.save(post).execute()
+        // PostsApi.retrofitService.save(post).execute()
 
         PostsApi.retrofitService.save(post).enqueue(object : Callback<Post> {
             override fun onResponse(call: Call<Post>, response: Response<Post>) {
@@ -53,6 +53,7 @@ class PostRepositoryImpl : PostRepository {
                 }
                 callback.onSuccess(response.body() ?: throw RuntimeException("body is null"))
             }
+
             override fun onFailure(call: Call<Post>, t: Throwable) {
                 callback.onError(RuntimeException(t))
             }
@@ -60,15 +61,16 @@ class PostRepositoryImpl : PostRepository {
     }
 
     override fun removeById(id: Long, callback: PostRepository.PostsCallback<Unit>) {
-       // PostsApi.retrofitService.removeById(id).execute()
+        // PostsApi.retrofitService.removeById(id).execute()
         PostsApi.retrofitService.removeById(id).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if (!response.isSuccessful) {
                     callback.onError(RuntimeException(response.message()))
                     return
                 }
-               callback.onSuccess(Unit)
+                callback.onSuccess(Unit)
             }
+
             override fun onFailure(call: Call<Unit>, t: Throwable) {
                 callback.onError(RuntimeException(t))
             }
@@ -84,6 +86,7 @@ class PostRepositoryImpl : PostRepository {
                 }
                 callback.onSuccess(response.body() ?: throw RuntimeException("body is null"))
             }
+
             override fun onFailure(call: Call<Post>, t: Throwable) {
                 callback.onError(RuntimeException(t))
             }
@@ -99,6 +102,7 @@ class PostRepositoryImpl : PostRepository {
                 }
                 callback.onSuccess(response.body() ?: throw RuntimeException("body is null"))
             }
+
             override fun onFailure(call: Call<Post>, t: Throwable) {
                 callback.onError(RuntimeException(t))
             }
