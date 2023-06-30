@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
@@ -27,6 +26,8 @@ class FeedFragment : Fragment() {
     private val viewModel: PostViewModel by viewModels(
         ownerProducer = ::requireParentFragment
     )
+
+//    private val viewModel: PostViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,16 +48,9 @@ class FeedFragment : Fragment() {
         val adapter = PostsAdapter(object : OnInteractionListener {
             override fun onEdit(post: Post) {
                 viewModel.edit(post)
-                //  findNavController().navigate(R.id.action_feedFragment_to_newPostFragment, Bundle().apply { textArg = post.content })
             }
 
             override fun onLike(post: Post) {
-//                if (post.likedByMe) {
-//                    viewModel.unLikeById(post.id)
-//                } else {
-//                    viewModel.likeById(post.id)
-//                }
-
                 viewModel.likeByIdV2(post)
             }
 
@@ -65,7 +59,6 @@ class FeedFragment : Fragment() {
             }
 
             override fun onShare(post: Post) {
-                viewModel.sharedById(post.id)
                 val intent = Intent().apply {
                     action = Intent.ACTION_SEND
                     putExtra(Intent.EXTRA_TEXT, post.content)
@@ -85,59 +78,51 @@ class FeedFragment : Fragment() {
             }
 
             override fun onViewPost(post: Post) {
-
                 findNavController().navigate(
                     R.id.action_feedFragment_to_PostFragment,
                     Bundle().apply { textArg = post.id.toString() })
+
             }
         })
         binding.list.adapter = adapter
+        viewModel.dataState.observe(viewLifecycleOwner) { state ->
+            binding.progress.isVisible = state.loading
+            binding.swipeRefresh.isRefreshing = state.refreshing
+            //binding.errorGroup.isVisible = state.error
+
+            if (state.smallError || state.error) {
+                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.retry_loading) {
+                        viewModel.loadPosts()
+                    }
+                    .show()
+            }
+        }
 
         viewModel.data.observe(viewLifecycleOwner) { state ->
             adapter.submitList(state.posts)
-            if (binding.swipeRefreshLayout.isRefreshing) {
-                binding.progress.isVisible = false
-                binding.swipeRefreshLayout.isRefreshing = state.loading
-            } else {
-                binding.progress.isVisible = state.loading
-
-            }
-            binding.errorGroup.isVisible = state.error
             binding.emptyText.isVisible = state.empty
-
-            if (state.smallError) {
-                Snackbar.make(
-                    binding.root,
-                    R.string.error_loading,
-                    BaseTransientBottomBar.LENGTH_INDEFINITE
-                ).setAction(android.R.string.cancel)
-                {
-
-                }.show()
-            }
-
         }
 
         binding.retryButton.setOnClickListener {
             viewModel.loadPosts()
         }
 
-
         binding.fab.setOnClickListener {
             findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
         }
 
 
-        viewModel.edited.observe(viewLifecycleOwner) { post ->
-            if (post.id != 0L) {
+        viewModel.edited.observe(viewLifecycleOwner) { editedPost ->
+            if (editedPost.id != 0L) {
                 findNavController().navigate(
                     R.id.action_feedFragment_to_newPostFragment,
-                    Bundle().apply { textArg = post.content })
+                    Bundle().apply { textArg = editedPost.content })
             }
         }
 
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.loadPosts()
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.refreshPosts()
 
         }
 

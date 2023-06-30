@@ -4,7 +4,6 @@ package ru.netology.nmedia.activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-//import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +14,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentPostBinding
@@ -82,33 +80,31 @@ class PostFragment : Fragment() {
 
 
         // val post = arguments?.textArg?.toLong()?.let { viewModel.getPost(it) }
-        arguments?.textArg?.toLong()?.let { viewModel.getPost(it) }
+        arguments?.textArg?.toLong()?.let { viewModel.getById(it) }
+
+
+        viewModel.postState.observe(viewLifecycleOwner) { state ->
+            binding.progress.isVisible = state.loading
+            // binding.errorGroup.isVisible = state.error
+            binding.swipeRefresh.isRefreshing = state.refreshing
+
+//            if (binding.errorGroup.isVisible) {
+//                binding.retryButton.setOnClickListener {
+//                    arguments?.textArg?.toLong()?.let { viewModel.getById(it) }
+//                }
+//            }
+
+            if (state.smallError || state.error) {
+                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.retry_loading) {
+                        arguments?.textArg?.toLong()?.let { viewModel.getById(it) }
+                    }
+                    .show()
+            }
+        }
+
 
         viewModel.post.observe(viewLifecycleOwner) { state ->
-
-            binding.progress.isVisible = state.loading
-            binding.errorGroup.isVisible = state.error
-            binding.emptyText.isVisible = state.empty
-
-            if (binding.errorGroup.isVisible) {
-                binding.retryButton.setOnClickListener {
-                    arguments?.textArg?.toLong()?.let { viewModel.getPost(it) }
-                }
-            }
-
-            if (state.smallError) {
-                Snackbar.make(
-                    binding.root,
-                    R.string.error_loading,
-                    BaseTransientBottomBar.LENGTH_INDEFINITE
-                ).setAction(android.R.string.cancel)
-                {
-
-                }.show()
-            }
-
-
-
             if (state.post != null) {
 
                 binding.cardPostScroll.visibility = View.VISIBLE
@@ -156,7 +152,6 @@ class PostFragment : Fragment() {
                     }
 
                     share.setOnClickListener {
-                        viewModel.sharedById(state.post.id)
                         val intent = Intent().apply {
                             action = Intent.ACTION_SEND
                             putExtra(Intent.EXTRA_TEXT, state.post.content)
@@ -169,12 +164,6 @@ class PostFragment : Fragment() {
                     }
 
                     like.setOnClickListener {
-//                        if (state.post.likedByMe) {
-//                            viewModel.unLikeByIdFromPost(state.post.id)
-//                        } else {
-//                            viewModel.likeByIdFromPost(state.post.id)
-//                        }
-
                         viewModel.likeByIdFromPostV2()
 
                     }
@@ -210,6 +199,11 @@ class PostFragment : Fragment() {
 
                 }
             }
+
+        }
+
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.refreshPost()
 
         }
 
