@@ -28,5 +28,6 @@
     <string name="channel_remote_description">Notifications from remote server</string>
     <string name="network_error">Network Error</string>
     <string name="description_attachment">Attachment</string>
+    <string name="new_posts">New posts</string>
 
 </resources>

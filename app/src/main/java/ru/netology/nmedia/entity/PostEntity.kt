@@ -19,7 +19,8 @@ data class PostEntity(
     var shared: Int = 0,
     var viewsCount: Int = 0,
     var video: String? = null,
-    @Embedded val attachment: Attachment? = null
+    @Embedded val attachment: Attachment? = null,
+    val hidden: Boolean = false
 ) {
     fun toDto() = Post(
         id,
@@ -32,7 +33,7 @@ data class PostEntity(
         shared,
         viewsCount,
         video,
-        attachment
+        attachment,
     )
 
     companion object {
@@ -48,10 +49,11 @@ data class PostEntity(
                 dto.shared,
                 dto.viewsCount,
                 dto.video,
-                dto.attachment
+                dto.attachment,
+                hidden = false,
             )
     }
 }
 
-//fun List<PostEntity>.toListDto(): List<Post> = map(PostEntity::toDto)
-//fun List<Post>.toEntityFromList(): List<PostEntity> = map(PostEntity::fromDto)
+fun List<PostEntity>.toDto(): List<Post> = map(PostEntity::toDto)
+fun List<Post>.toEntity(): List<PostEntity> = map(PostEntity::fromDto)

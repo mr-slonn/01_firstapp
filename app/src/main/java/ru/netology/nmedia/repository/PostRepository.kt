@@ -1,14 +1,15 @@
 package ru.netology.nmedia.repository
 
-//import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveData
+import kotlinx.coroutines.flow.Flow
 import ru.netology.nmedia.dto.Post
 
 interface PostRepository {
 
-    val data: LiveData<List<Post>>
+    val data: Flow<List<Post>>
 
     suspend fun getAll()
+
+    suspend fun showAll()
 
     // fun getById(id: Long):LiveData<Post?>
     //suspend fun getById(id: Long):Post?
@@ -19,6 +20,14 @@ interface PostRepository {
     suspend fun save(post: Post)
     suspend fun getAttachmentUrl(fileName: String): String
     suspend fun getAvatarUrl(fileName: String): String
+    fun getNewerCount(id: Long): Flow<Int>
+
+
+
+
+
+
+
 
 
 }
