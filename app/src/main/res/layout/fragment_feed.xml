@@ -14,7 +14,8 @@
         android:layout_gravity="center_horizontal"
         android:text="@string/new_posts"
         android:layout_margin="@dimen/common_spacing"
-        android:drawableLeft="@drawable/baseline_refresh_24"
+
+        app:icon="@drawable/baseline_refresh_24"
         android:drawableTint="#FFF"
         android:visibility="gone"
         />

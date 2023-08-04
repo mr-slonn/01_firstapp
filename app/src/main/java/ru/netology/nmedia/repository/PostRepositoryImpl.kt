@@ -13,9 +13,15 @@ import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
 import java.lang.RuntimeException
 import kotlinx.coroutines.flow.*
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import ru.netology.nmedia.dto.Attachment
+import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.entity.toEntity
+import ru.netology.nmedia.enumeration.AttachmentType
 import ru.netology.nmedia.error.ApiError
-
+import ru.netology.nmedia.error.AppError
+import ru.netology.nmedia.model.PhotoModel
 
 
 class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
@@ -69,7 +75,40 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
             }
         }
     }
+//    override suspend fun saveWithAttachment(post: Post, upload: MediaUpload) {
+    override suspend fun saveWithAttachment(post: Post, upload: PhotoModel) {
+        try {
+            val media = upload(upload)
+            // TODO: add support for other types
+            val postWithAttachment = post.copy(attachment = Attachment(media.id, AttachmentType.IMAGE))
+            save(postWithAttachment)
+        } catch (e: AppError) {
+            throw e
+        } catch (e: java.io.IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+// override suspend fun upload(upload: MediaUpload): Media {
+    override suspend fun upload(upload: PhotoModel): Media {
+        try {
+            val media = MultipartBody.Part.createFormData(
+                "file", upload.file.name, upload.file.asRequestBody()
+            )
 
+            val response = PostsApi.retrofitService.upload(media)
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+
+            return response.body() ?: throw ApiError(response.code(), response.message())
+        } catch (e: java.io.IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
 
 
     override suspend fun showAll() {

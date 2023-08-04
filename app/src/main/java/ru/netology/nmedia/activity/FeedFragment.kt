@@ -12,9 +12,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
+import ru.netology.nmedia.activity.NewPostFragment.Companion.mediaArg
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
@@ -82,8 +82,18 @@ class FeedFragment : Fragment() {
             override fun onViewPost(post: Post) {
                 findNavController().navigate(
                     R.id.action_feedFragment_to_PostFragment,
-                    Bundle().apply { textArg = post.id.toString() })
+                    Bundle().apply {
+                        textArg = post.id.toString()
 
+                    })
+            }
+
+            override fun onViewAttachment(post: Post) {
+                findNavController().navigate(
+                    R.id.action_feedFragment_to_photoFragment,
+                    Bundle().apply {
+                        mediaArg = post.attachment?.url
+                    })
             }
         })
         binding.list.adapter = adapter
@@ -119,7 +129,10 @@ class FeedFragment : Fragment() {
             if (editedPost.id != 0L) {
                 findNavController().navigate(
                     R.id.action_feedFragment_to_newPostFragment,
-                    Bundle().apply { textArg = editedPost.content })
+                    Bundle().apply {
+                        textArg = editedPost.content
+                        mediaArg = editedPost.attachment?.url
+                    })
             }
         }
 
@@ -137,13 +150,13 @@ class FeedFragment : Fragment() {
             it.isVisible = false
         }
 
-        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                if (positionStart == 0) {
-                    binding.list.smoothScrollToPosition(0)
-                }
-            }
-        })
+//        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+//            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+//                if (positionStart == 0) {
+//                    binding.list.smoothScrollToPosition(0)
+//                }
+//            }
+//        })
 
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.refreshPosts()

@@ -16,20 +16,22 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
+import ru.netology.nmedia.activity.NewPostFragment.Companion.mediaArg
+import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.databinding.FragmentPostBinding
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.services.Services
-import ru.netology.nmedia.util.StringArg
-import ru.netology.nmedia.util.loadAttachment
 import ru.netology.nmedia.util.loadAvatar
+import ru.netology.nmedia.util.loadMediaAttachment
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 
 class PostFragment : Fragment() {
 
-    companion object {
-        var Bundle.textArg: String? by StringArg
-    }
+//    companion object {
+//        var Bundle.textArg: String? by StringArg
+//        var Bundle.mediaArg: String? by StringArg
+//    }
 
     private val viewModel: PostViewModel by viewModels(
         ownerProducer = ::requireParentFragment
@@ -128,7 +130,7 @@ class PostFragment : Fragment() {
 
                     if (state.post.attachment != null) {
                         //     attachment.loadAttachment(viewModel.getAttachmentUrl(state.post.attachment.url))
-                        attachment.loadAttachment(state.post.attachment.url)
+                        attachment.loadMediaAttachment(state.post.attachment.url)
                         attachment.visibility = View.VISIBLE
                     } else {
                         attachment.visibility = View.GONE
@@ -149,6 +151,14 @@ class PostFragment : Fragment() {
                     }
                     videoButton.setOnClickListener {
                         onPlayVideo(state.post)
+                    }
+
+                    attachment.setOnClickListener {
+                        findNavController().navigate(
+                            R.id.action_PostFragment_to_photoFragment,
+                            Bundle().apply {
+                                mediaArg = state.post.attachment?.url
+                            })
                     }
 
                     share.setOnClickListener {
@@ -187,10 +197,12 @@ class PostFragment : Fragment() {
                                         viewModel.edit(state.post)
                                         findNavController().navigate(
                                             R.id.action_PostFragment_to_newPostFragment2,
-                                            Bundle().apply { textArg = state.post.content })
+                                            Bundle().apply {
+                                                textArg = state.post.content
+                                                mediaArg = state.post.attachment?.url},
+                                            )
                                         true
                                     }
-
                                     else -> false
                                 }
                             }

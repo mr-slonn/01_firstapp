@@ -10,6 +10,7 @@
     <string name="menu_remove">Remove</string>
     <string name="post_text">Post Text</string>
     <string name="menu_edit">Edit</string>
+    <string name="menu_save">Save</string>
     <string name="description_post_cancel">Cancel</string>
     <string name="error_empty_content">Content can\'t be empty</string>
     <string name="chooser_share_post">Share post</string>
@@ -29,5 +30,10 @@
     <string name="network_error">Network Error</string>
     <string name="description_attachment">Attachment</string>
     <string name="new_posts">New posts</string>
-
+    <string name="description_select_photo">Select photo</string>
+    <string name="description_take_photo">Take photo</string>
+    <string name="description_photo">Photo</string>
+    <string name="remove">Remove</string>
+    <string name="back">Back</string>
 </resources>
+

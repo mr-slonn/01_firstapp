@@ -14,6 +14,7 @@ import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
 import ru.netology.nmedia.model.FeedModelState
+import ru.netology.nmedia.model.PhotoModel
 import ru.netology.nmedia.model.PostModel
 import ru.netology.nmedia.model.PostModelState
 import ru.netology.nmedia.repository.PostRepository
@@ -31,6 +32,8 @@ private val empty = Post(
     shared = 0,
     viewsCount = 0
 )
+
+//private val noPhoto = PhotoModel()
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: PostRepository =
@@ -52,13 +55,15 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     val newerCount: LiveData<Int> = data.switchMap {
         repository.getNewerCount(it.posts.firstOrNull()?.id ?: 0L)
             //.catch { e -> e.printStackTrace() }
-           //.asLiveData(Dispatchers.Default)
+            //.asLiveData(Dispatchers.Default)
             .asLiveData(Dispatchers.Default, 1000)
     }
 
 
-
-
+    //private val _photo = MutableLiveData(noPhoto)
+    private val _photo = MutableLiveData<PhotoModel?>()
+    val photo: LiveData<PhotoModel?>
+        get() = _photo
 
     private val _edited = MutableLiveData(empty)
     val edited
@@ -183,20 +188,44 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         _edited.value = empty
     }
 
+    //    fun save() {
+//        _edited.value?.let {
+//            viewModelScope.launch {
+//                try {
+//                    repository.save(it)
+//                    _postCreated.value = Unit
+//                    _dataState.value = FeedModelState()
+//                    _edited.value = empty
+//                } catch (e: Exception) {
+//                    // _postCreated.value = FeedModelState(error = true)
+//                    _postNotCreated.value = Unit
+//                }
+//            }
+//        }
+//    }
     fun save() {
-        _edited.value?.let {
+        edited.value?.let {
+            _postCreated.value = Unit
             viewModelScope.launch {
                 try {
-                    repository.save(it)
-                    _postCreated.value = Unit
+                    when (val photo = _photo.value) {
+                        null ->  repository.save(it)
+//                        else -> _photo.value?.file?.let { file ->
+//                           // repository.saveWithAttachment(it, MediaUpload(file))
+//                            repository.saveWithAttachment(it, file)
+//                        }
+                        else -> repository.saveWithAttachment(it, photo)
+                    }
                     _dataState.value = FeedModelState()
                     _edited.value = empty
                 } catch (e: Exception) {
-                    // _postCreated.value = FeedModelState(error = true)
+                    _dataState.value = FeedModelState(error = true)
                     _postNotCreated.value = Unit
                 }
             }
         }
+        edited.value = empty
+        _photo.value = null
     }
 
     fun edit(post: Post) {
@@ -220,5 +249,16 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         } catch (e: java.lang.Exception) {
             _dataState.value = FeedModelState(error = true)
         }
+    }
+
+    //    fun changePhoto(uri: Uri, toFile: File) {
+//        _photo.value = PhotoModel(uri, file)
+//    }
+    fun changePhoto(photoModel: PhotoModel) {
+        _photo.value = photoModel
+    }
+
+    fun clearPhoto() {
+        _photo.value = null
     }
 }

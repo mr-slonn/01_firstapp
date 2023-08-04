@@ -25,6 +25,9 @@
             app:exitAnim="@android:anim/fade_out"
             app:popEnterAnim="@android:anim/fade_in"
             app:popExitAnim="@android:anim/fade_out" />
+        <action
+            android:id="@+id/action_feedFragment_to_photoFragment"
+            app:destination="@id/photoFragment" />
 
     </fragment>
     <fragment
@@ -52,5 +55,12 @@
             app:exitAnim="@android:anim/fade_out"
             app:popEnterAnim="@android:anim/fade_in"
             app:popExitAnim="@android:anim/fade_out"/>
+        <action
+            android:id="@+id/action_PostFragment_to_photoFragment"
+            app:destination="@id/photoFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/photoFragment"
+        android:name="ru.netology.nmedia.activity.PhotoFragment"
+        android:label="PhotoFragment" />
 </navigation>

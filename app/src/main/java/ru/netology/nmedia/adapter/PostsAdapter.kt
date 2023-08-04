@@ -11,8 +11,8 @@ import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.services.Services
-import ru.netology.nmedia.util.loadAttachment
 import ru.netology.nmedia.util.loadAvatar
+import ru.netology.nmedia.util.loadMediaAttachment
 
 interface OnInteractionListener {
     fun onLike(post: Post) {}
@@ -21,6 +21,9 @@ interface OnInteractionListener {
     fun onEdit(post: Post) {}
     fun onPlayVideo(post: Post) {}
     fun onViewPost(post: Post) {}
+    fun onViewAttachment(post: Post) {}
+
+
 }
 
 
@@ -62,7 +65,8 @@ class PostViewHolder(
             }
 
             if (post.attachment != null) {
-                attachment.loadAttachment(post.attachment.url)
+                //attachment.loadAttachment(post.attachment.url)
+                attachment.loadMediaAttachment(post.attachment.url)
                 attachment.visibility = View.VISIBLE
             } else {
                 attachment.visibility = View.GONE
@@ -101,6 +105,11 @@ class PostViewHolder(
             like.setOnClickListener {
                 onInteractionListener.onLike(post)
             }
+
+            attachment.setOnClickListener {
+                onInteractionListener.onViewAttachment(post)
+            }
+
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
                     inflate(R.menu.options_post)
