@@ -35,5 +35,21 @@
     <string name="description_photo">Photo</string>
     <string name="remove">Remove</string>
     <string name="back">Back</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_auth">Authorization</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="password_retry">Password retry</string>
+    <string name="password_not_retry">The password doesn\'t match</string>
+    <string name="empty_input">All fields are not filled in</string>
+    <string name="avatar">Avatar</string>
+    <string name="name">Name</string>
+    <string name="access_log_out">Are you sure you want to get out?</string>
+    <string name="close">Close</string>
+    <string name="confirm_log_in">You are not logged in, do you want to log in and become an author?</string>
+    <string name="account">Account</string>
+
 </resources>
 

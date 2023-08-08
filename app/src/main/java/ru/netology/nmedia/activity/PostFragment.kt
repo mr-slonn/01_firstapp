@@ -1,6 +1,7 @@
 package ru.netology.nmedia.activity
 
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -18,11 +19,13 @@ import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.mediaArg
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
+
 import ru.netology.nmedia.databinding.FragmentPostBinding
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.services.Services
 import ru.netology.nmedia.util.loadAvatar
 import ru.netology.nmedia.util.loadMediaAttachment
+import ru.netology.nmedia.viewmodel.AuthViewModel
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 
@@ -36,6 +39,12 @@ class PostFragment : Fragment() {
     private val viewModel: PostViewModel by viewModels(
         ownerProducer = ::requireParentFragment
     )
+
+    private val authViewModel: AuthViewModel by viewModels(
+        ownerProducer = ::requireParentFragment
+    )
+
+    private var authorized = false
 
     private var _binding: FragmentPostBinding? = null
 
@@ -52,6 +61,9 @@ class PostFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+
+
         _binding = FragmentPostBinding.inflate(inflater, container, false)
 
         val actionBar = (activity as AppCompatActivity).supportActionBar
@@ -103,6 +115,10 @@ class PostFragment : Fragment() {
                     }
                     .show()
             }
+        }
+
+        authViewModel.data.observe(viewLifecycleOwner) { token ->
+            authorized = token.token != null
         }
 
 
@@ -173,10 +189,57 @@ class PostFragment : Fragment() {
                         startActivity(shareIntent)
                     }
 
+                   like.isCheckable = authorized
+
                     like.setOnClickListener {
-                        viewModel.likeByIdFromPostV2()
+
+                        if (authorized) {
+                            viewModel.likeByIdFromPostV2()
+                        }
+                        else
+                        {
+                            val builder = AlertDialog.Builder(context)
+                            //set title for alert dialog
+                            builder.setTitle(R.string.account)
+                            //set message for alert dialog
+
+                            builder.setMessage(R.string.confirm_log_in )
+                            builder.setIcon(R.drawable.baseline_login_24)
+
+
+                                builder.setPositiveButton(R.string.sign_auth) { _, _ ->
+                                    findNavController().navigate(
+                                        R.id.action_feedFragment_to_logInFragment,
+                                        Bundle().apply {
+                                            textArg = "signin"
+                                        })
+                                }
+
+                                builder.setNegativeButton(R.string.sign_up) { _, _ ->
+                                    findNavController().navigate(
+                                        R.id.action_feedFragment_to_logInFragment,
+                                        Bundle().apply {
+                                            textArg = "signup"
+                                        })
+                                }
+
+
+                            //performing cancel action
+                            builder.setNeutralButton(R.string.description_post_cancel) { _, _ ->
+
+                            }
+                            //performing negative action
+
+                            // Create the AlertDialog
+                            val alertDialog: AlertDialog = builder.create()
+                            // Set other dialog properties
+                            alertDialog.setCancelable(false)
+                            alertDialog.show()
+                        }
 
                     }
+
+                    menu.isVisible = state.post.ownedByMe
 
                     menu.setOnClickListener {
                         PopupMenu(it.context, it).apply {

@@ -1,18 +1,24 @@
 package ru.netology.nmedia.adapter
 
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import androidx.core.view.isVisible
+
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+
 import ru.netology.nmedia.R
+
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.services.Services
 import ru.netology.nmedia.util.loadAvatar
 import ru.netology.nmedia.util.loadMediaAttachment
+
 
 interface OnInteractionListener {
     fun onLike(post: Post) {}
@@ -29,11 +35,12 @@ interface OnInteractionListener {
 
 class PostsAdapter(
     private val onInteractionListener: OnInteractionListener,
+    private val authorized:Boolean
 ) :
     ListAdapter<Post, PostViewHolder>(PostDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = CardPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return PostViewHolder(binding, onInteractionListener)
+        return PostViewHolder(binding, onInteractionListener, authorized)
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
@@ -47,6 +54,8 @@ class PostsAdapter(
 class PostViewHolder(
     private val binding: CardPostBinding,
     private val onInteractionListener: OnInteractionListener,
+    private val authorized:Boolean
+
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(post: Post) {
         binding.apply {
@@ -102,6 +111,9 @@ class PostViewHolder(
                 onInteractionListener.onShare(post)
             }
 
+            like.isCheckable = authorized
+
+
             like.setOnClickListener {
                 onInteractionListener.onLike(post)
             }
@@ -109,7 +121,7 @@ class PostViewHolder(
             attachment.setOnClickListener {
                 onInteractionListener.onViewAttachment(post)
             }
-
+            menu.isVisible = post.ownedByMe
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
                     inflate(R.menu.options_post)

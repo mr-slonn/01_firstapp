@@ -8,8 +8,11 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
@@ -26,11 +29,13 @@ private val empty = Post(
     id = 0,
     content = "",
     author = "",
+    authorId = 0L,
     likedByMe = false,
     likes = 0,
     published = "",
     shared = 0,
-    viewsCount = 0
+    viewsCount = 0,
+    ownedByMe = false,
 )
 
 //private val noPhoto = PhotoModel()
@@ -48,9 +53,33 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     val postState: LiveData<PostModelState>
         get() = _postState
 
-    val data: LiveData<FeedModel> = repository.data.map {
-        FeedModel(posts = it, empty = it.isEmpty())
-    }.asLiveData(Dispatchers.Default)
+//    val data: LiveData<FeedModel> = repository.data.map {
+//        FeedModel(posts = it, empty = it.isEmpty())
+//    }.asLiveData(Dispatchers.Default)
+
+//    val data: LiveData<FeedModel> = AppAuth.getInstance()
+//        .data
+//        .flatMapLatest { (myId, _) ->
+//            repository.data
+//                .map { posts ->
+//                    FeedModel(
+//                        posts.map { it.copy(ownedByMe = it.authorId == myId) },
+//                        posts.isEmpty()
+//                    )
+//                }
+//        }.asLiveData(Dispatchers.Default)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val data: LiveData<FeedModel> = AppAuth.getInstance()
+        .data
+        .flatMapLatest { token ->
+            repository.data.map { posts ->
+                FeedModel(
+                    posts = posts.map { it.copy(ownedByMe = it.authorId == token.id) },
+                    empty = posts.isEmpty()
+                )
+            }
+        }.asLiveData(Dispatchers.Default)
 
     val newerCount: LiveData<Int> = data.switchMap {
         repository.getNewerCount(it.posts.firstOrNull()?.id ?: 0L)
@@ -209,7 +238,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             viewModelScope.launch {
                 try {
                     when (val photo = _photo.value) {
-                        null ->  repository.save(it)
+                        null -> repository.save(it)
 //                        else -> _photo.value?.file?.let { file ->
 //                           // repository.saveWithAttachment(it, MediaUpload(file))
 //                            repository.saveWithAttachment(it, file)
@@ -260,5 +289,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun clearPhoto() {
         _photo.value = null
+        _edited.value = _edited.value?.copy(attachment = null)
     }
 }

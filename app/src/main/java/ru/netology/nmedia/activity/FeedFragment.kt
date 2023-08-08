@@ -1,14 +1,19 @@
 package ru.netology.nmedia.activity
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -18,8 +23,10 @@ import ru.netology.nmedia.activity.NewPostFragment.Companion.mediaArg
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
+import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.viewmodel.AuthViewModel
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 
@@ -31,11 +38,62 @@ class FeedFragment : Fragment() {
 
 //    private val viewModel: PostViewModel by activityViewModels()
 
+    fun showDialog(signIn:Boolean) {
+        val builder = AlertDialog.Builder(context)
+        //set title for alert dialog
+        builder.setTitle(R.string.account)
+        //set message for alert dialog
+
+        builder.setMessage(if (signIn) R.string.confirm_log_in else R.string.access_log_out)
+        builder.setIcon(R.drawable.baseline_login_24)
+
+        if (signIn)
+        //performing positive action
+        {
+            builder.setPositiveButton(R.string.sign_auth) { _, _ ->
+                findNavController().navigate(
+                    R.id.action_feedFragment_to_logInFragment,
+                    Bundle().apply {
+                        textArg = "signin"
+                    })
+            }
+
+            builder.setNegativeButton(R.string.sign_up) { _, _ ->
+                findNavController().navigate(
+                    R.id.action_feedFragment_to_logInFragment,
+                    Bundle().apply {
+                        textArg = "signup"
+                    })
+            }
+        }
+        else
+        {
+            builder.setPositiveButton(R.string.sign_out) { _, _ ->
+                AppAuth.getInstance().removeAuth()
+            }
+        }
+
+        //performing cancel action
+        builder.setNeutralButton(R.string.description_post_cancel) { _, _ ->
+
+        }
+        //performing negative action
+
+        // Create the AlertDialog
+        val alertDialog: AlertDialog = builder.create()
+        // Set other dialog properties
+        alertDialog.setCancelable(false)
+        alertDialog.show()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+
+        var authorized = false
 
         val actionBar = (activity as AppCompatActivity).supportActionBar
         actionBar?.setDisplayShowHomeEnabled(false)
@@ -47,13 +105,19 @@ class FeedFragment : Fragment() {
             false
         )
 
-        val adapter = PostsAdapter(object : OnInteractionListener {
+        val adapter = PostsAdapter(
+            object : OnInteractionListener {
             override fun onEdit(post: Post) {
                 viewModel.edit(post)
             }
 
             override fun onLike(post: Post) {
-                viewModel.likeByIdV2(post)
+
+                if (!authorized) {
+                    showDialog(true)
+                } else {
+                    viewModel.likeByIdV2(post)
+                }
             }
 
             override fun onRemove(post: Post) {
@@ -95,7 +159,7 @@ class FeedFragment : Fragment() {
                         mediaArg = post.attachment?.url
                     })
             }
-        })
+        }, authorized)
         binding.list.adapter = adapter
         viewModel.dataState.observe(viewLifecycleOwner) { state ->
             binding.progress.isVisible = state.loading
@@ -120,8 +184,15 @@ class FeedFragment : Fragment() {
             viewModel.loadPosts()
         }
 
+
         binding.fab.setOnClickListener {
-            findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
+
+            if (!authorized) {
+                showDialog(true)
+            } else {
+                findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
+            }
+
         }
 
 
@@ -137,8 +208,8 @@ class FeedFragment : Fragment() {
         }
 
         viewModel.newerCount.observe(viewLifecycleOwner) { state ->
-           Log.d("FeedFragment", "New count: $state")
-            if (state != 0 && binding.retryButton.visibility == View.GONE ) {
+            Log.d("FeedFragment", "New count: $state")
+            if (state != 0 && binding.retryButton.visibility == View.GONE) {
                 binding.reloadNewPosts.isVisible = true
             }
         }
@@ -161,6 +232,66 @@ class FeedFragment : Fragment() {
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.refreshPosts()
 
+        }
+
+        val authViewModel: AuthViewModel by viewModels()
+        var currentMenuProvider: MenuProvider? = null
+
+
+        authViewModel.data.observe(viewLifecycleOwner) { token ->
+            authorized = token.token != null
+
+            currentMenuProvider?.let {
+                requireActivity().removeMenuProvider(it)
+            }
+            requireActivity().addMenuProvider(
+                object : MenuProvider {
+                    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                        menuInflater.inflate(R.menu.menu_main, menu)
+                        menu.setGroupVisible(R.id.unauthenticated, !authorized)
+                        menu.setGroupVisible(R.id.authenticated, authorized)
+                    }
+
+                    override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
+                        when (menuItem.itemId) {
+                            R.id.signin -> {
+                                                       //AppAuth.getInstance().setAuth(5, "x-token")
+                                findNavController().navigate(
+                                    R.id.action_feedFragment_to_logInFragment,
+                                    Bundle().apply {
+                                        textArg = "signin"
+                                    })
+                                true
+                            }
+
+                            R.id.signup -> {
+
+                                //AppAuth.getInstance().setAuth(5, "x-token")
+                                findNavController().navigate(
+                                    R.id.action_feedFragment_to_logInFragment,
+                                    Bundle().apply {
+                                        textArg = "signup"
+                                    })
+                                true
+                            }
+
+                            R.id.signout -> {
+                                showDialog(false)
+                                //AppAuth.getInstance().removeAuth()
+                                true
+                            }
+
+                            else ->
+                                false
+
+                            ///super.onOptionsItemSelected(item)
+
+                        }
+                }.also {
+                    currentMenuProvider = it
+                },
+                viewLifecycleOwner,
+            )
         }
 
         return binding.root

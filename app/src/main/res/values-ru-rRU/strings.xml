@@ -36,5 +36,21 @@
     <string name="description_photo">Фото</string>
     <string name="remove">Удалить</string>
     <string name="back">Назад</string>
+    <string name="sign_in">Вход</string>
+    <string name="sign_up">Регистрация</string>
+    <string name="sign_auth">Авторизация</string>
+    <string name="sign_out">Выход</string>
+    <string name="login">Логин</string>
+    <string name="password">Пароль</string>
+    <string name="password_retry">Повторите пароль</string>
+    <string name="password_not_retry">Пароли не совпадают</string>
+    <string name="empty_input">Не заполнены все поля</string>
+    <string name="avatar">Портрет</string>
+    <string name="name">Имя</string>
+    <string name="close">Закрыть</string>
+    <string name="access_log_out">Вы уверены что хотите выйти?</string>
+    <string name="confirm_log_in">Вы не авторизованы, хотите авторизоваться и стать автором? </string>
+    <string name="account">Учётная запись</string>
+
 
 </resources>

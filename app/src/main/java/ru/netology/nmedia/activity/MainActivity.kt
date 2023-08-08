@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                 }
             }
-        }
+        }, false
         )
 
         binding.list.adapter = adapter
