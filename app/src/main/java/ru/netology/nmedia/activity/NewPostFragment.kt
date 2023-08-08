@@ -114,6 +114,7 @@ class NewPostFragment : Fragment() {
         }
 
 
+
 //        binding.ok.setOnClickListener {
 //            actionBar?.setDisplayHomeAsUpEnabled(false)
 //            actionBar?.setDisplayShowHomeEnabled(false)
@@ -161,7 +162,9 @@ class NewPostFragment : Fragment() {
 
         binding.removePhoto.setOnClickListener {
             viewModel.clearPhoto()
+            binding.photoContainer.isGone = true
         }
+
 
 
         viewModel.photo.observe(viewLifecycleOwner) {photo->
