@@ -13,6 +13,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import ru.netology.nmedia.R
+import ru.netology.nmedia.auth.AppAuth
 import kotlin.random.Random
 
 
@@ -59,14 +60,19 @@ class FCMService : FirebaseMessagingService() {
                     )
                 }
             }
-
         }
-
-
+        message.data[content]?.let {
+                handlePush(
+                    gson.fromJson(
+                        message.data[content],
+                        Push::class.java
+                    )
+                )
+        }
     }
 
     override fun onNewToken(token: String) {
-        println(token)
+        AppAuth.getInstance().sendPushToken(token)
     }
 
     private fun handleLike(content: Like) {
@@ -139,12 +145,50 @@ class FCMService : FirebaseMessagingService() {
         NotificationManagerCompat.from(this).notify(Random.nextInt(100_000), notification)
     }
 
+    private fun handlePush(push: Push) {
+
+        //если recipientId = тому, что в AppAuth, то всё ok, показываете Notification;
+        if (AppAuth.getInstance().data.value.id == push.recipientId || push.recipientId == null) {
+
+
+            val notification = NotificationCompat.Builder(this, channelId)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle(push.content)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .build()
+
+
+//           НЕ РАБОТАЕТ С ЭТОЙ ПРОВЕРКОЙ
+//            if (ActivityCompat.checkSelfPermission(
+//                    this,
+//                    Manifest.permission.POST_NOTIFICATIONS
+//                ) != PackageManager.PERMISSION_GRANTED
+//            ) {
+//                // TODO: Consider calling
+//                //    ActivityCompat#requestPermissions
+//                // here to request the missing permissions, and then overriding
+//                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//                //                                          int[] grantResults)
+//                // to handle the case where the user grants the permission. See the documentation
+//                // for ActivityCompat#requestPermissions for more details.
+//                return
+//            }
+            NotificationManagerCompat.from(this).notify(Random.nextInt(100_000), notification)
+        }
+        //если recipientId = 0 (и не равен вашему), сервер считает, что у вас анонимная аутентификация и вам нужно переотправить свой push token;
+
+        else if (push.recipientId == 0L || push.recipientId != 0L) {
+            AppAuth.getInstance().sendPushToken()
+        }
+    }
+
 
 }
 
 enum class Action {
     LIKE,
     NEW_POST,
+
 }
 
 data class Like(
@@ -160,3 +204,7 @@ data class NewPost(
     val content: String,
 )
 
+data class Push(
+    val recipientId: Long?,
+    val content: String,
+)

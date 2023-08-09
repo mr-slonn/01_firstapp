@@ -110,6 +110,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     val post: LiveData<PostModel>
         get() = _post
 
+
     init {
         loadPosts()
     }
@@ -146,7 +147,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             _postState.value = PostModelState(refreshing = true)
             _post.value?.post?.let {
                 val post = repository.getById(it.id)
-                _post.postValue(PostModel(post = post))
+                _post.postValue(PostModel(post = post.copy(ownedByMe = it.authorId == AppAuth.getInstance().data.value.id)))
             }
             _postState.value = PostModelState()
         } catch (e: Exception) {
@@ -202,8 +203,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 _postState.value = PostModelState(loading = true)
-
-                _post.postValue(PostModel(repository.getById(id)))
+                val post = repository.getById(id)
+                _post.postValue(PostModel(post.copy(ownedByMe = post.authorId == AppAuth.getInstance().data.value.id)))
 
                 _postState.value = PostModelState()
             } catch (e: Exception) {

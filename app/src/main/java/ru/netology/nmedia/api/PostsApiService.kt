@@ -13,6 +13,7 @@ import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.dto.PushToken
 import ru.netology.nmedia.dto.Token
 
 
@@ -101,6 +102,10 @@ interface PostsApiService {
         @Part("name") name: RequestBody,
         @Part media: MultipartBody.Part,
     ): Response<Token>
+
+
+    @POST("users/push-tokens")
+    suspend fun sendPushToken(@Body pushToken: PushToken): Response<Unit>
 
 }
 

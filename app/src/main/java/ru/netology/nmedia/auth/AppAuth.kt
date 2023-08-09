@@ -3,8 +3,17 @@ package ru.netology.nmedia.auth
 import android.content.Context
 
 import androidx.core.content.edit
-import kotlinx.coroutines.flow.*
+import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import ru.netology.nmedia.api.PostsApi
+import ru.netology.nmedia.dto.PushToken
 import ru.netology.nmedia.dto.Token
+
 
 class AppAuth private constructor(context: Context) {
     private val prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
@@ -27,6 +36,7 @@ class AppAuth private constructor(context: Context) {
         {
             _data.value = Token(id = id, token= token)
         }
+        sendPushToken()
 
 
 //        if (id == 0L || token == null) {
@@ -56,6 +66,7 @@ class AppAuth private constructor(context: Context) {
             putString(tokenKey, token)
         }
         _data.value = Token(id = id, token= token)
+       sendPushToken()
     }
 
    // @Synchronized
@@ -69,7 +80,10 @@ class AppAuth private constructor(context: Context) {
            clear()
        }
        _data.value = Token()
+       sendPushToken()
     }
+
+
 
     companion object {
         private var INSTANCE: AppAuth? = null
@@ -95,6 +109,20 @@ class AppAuth private constructor(context: Context) {
 //        }
 //
 //        private fun buildAuth(context: Context): AppAuth = AppAuth(context)
+    }
+
+    fun sendPushToken(token: String? = null) {
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
+                val pushToken = PushToken(token ?: FirebaseMessaging.getInstance().token.await())
+                PostsApi.retrofitService.sendPushToken(pushToken)
+//               код из лекции
+            //                val pushToken = PushToken(token ?: Firebase.messaging.token.await())
+//                PostsApi.retrofitService.sendPushToken(pushToken)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 }
 
