@@ -22,40 +22,41 @@ class MainActivity : AppCompatActivity() {
 
         val viewModel: PostViewModel by viewModels()
 
-        val adapter = PostsAdapter(object : OnInteractionListener {
+        val adapter = PostsAdapter(
+            object : OnInteractionListener {
 
 
-            override fun onEdit(post: Post) {
-                viewModel.edit(post)
-            }
-
-            override fun onLike(post: Post) {
-                viewModel.likeByIdV2(post)
-            }
-
-            override fun onShare(post: Post) {
-
-                val intent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_TEXT, post.content)
-                    type = "text/plain"
+                override fun onEdit(post: Post) {
+                    viewModel.edit(post)
                 }
-                val shareIntent = Intent.createChooser(intent, "Share post")
-                startActivity(shareIntent)
-            }
 
-
-            override fun onRemove(post: Post) {
-                viewModel.removeById(post.id)
-            }
-
-            override fun onPlayVideo(post: Post) {
-                if (!post.video.isNullOrBlank()) {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(post.video))
-                    startActivity(intent)
+                override fun onLike(post: Post) {
+                    viewModel.likeByIdV2(post)
                 }
-            }
-        }, false
+
+                override fun onShare(post: Post) {
+
+                    val intent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, post.content)
+                        type = "text/plain"
+                    }
+                    val shareIntent = Intent.createChooser(intent, "Share post")
+                    startActivity(shareIntent)
+                }
+
+
+                override fun onRemove(post: Post) {
+                    viewModel.removeById(post.id)
+                }
+
+                override fun onPlayVideo(post: Post) {
+                    if (!post.video.isNullOrBlank()) {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(post.video))
+                        startActivity(intent)
+                    }
+                }
+            }, false
         )
 
         binding.list.adapter = adapter

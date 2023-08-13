@@ -4,8 +4,10 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import ru.netology.nmedia.api.PostsApi
-import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.api.ApiService
+
+import ru.netology.nmedia.dto.Token
+//import ru.netology.nmedia.di.DependencyContainer
 
 import ru.netology.nmedia.error.AuthError
 import ru.netology.nmedia.error.NetworkError
@@ -15,24 +17,31 @@ import ru.netology.nmedia.model.AuthModel
 import ru.netology.nmedia.model.RegisterModel
 import java.io.IOException
 import java.lang.RuntimeException
+import javax.inject.Inject
 
-class AuthRepositoryImpl : AuthRepository {
-    override suspend fun updateUser(authData: AuthModel) {
+class AuthRepositoryImpl @Inject constructor(
+    private val apiService: ApiService
+) : AuthRepository {
 
-         try {
-            val response = PostsApi.retrofitService.updateUser(authData.login, authData.password)
+    //    @Inject
+//    lateinit var appAuth: AppAuth
+    override suspend fun updateUser(authData: AuthModel): Token {
+
+        try {
+            val response = apiService.updateUser(authData.login, authData.password)
             if (!response.isSuccessful) {
                 throw RuntimeException(response.errorBody()?.string())
             }
-            val authData = response.body() ?: throw RuntimeException("body is null")
+            val authResponse = response.body() ?: throw RuntimeException("body is null")
 
-           if (authData.token != null) {
-               //Token(id = authData.id, token = it, authData.avatar.orEmpty())
-               AppAuth.getInstance().setAuth(id = authData.id, token = authData.token)
-           } else
-           {
-               throw AuthError
-           }
+            if (authResponse.token != null) {
+                //Token(id = authData.id, token = it, authData.avatar.orEmpty())
+                // DependencyContainer.getInstance().appAuth.setAuth(id = authData.id, token = authData.token)
+                //appAuth.setAuth(id = authData.id, token = authData.token)
+                return Token(id = authResponse.id, token = authResponse.token, authResponse.avatar.orEmpty())
+            } else {
+                throw AuthError
+            }
 
         } catch (e: IOException) {
             throw NetworkError
@@ -42,17 +51,17 @@ class AuthRepositoryImpl : AuthRepository {
 
     }
 
-    override suspend fun register(registerData: RegisterModel) {
-         try {
+    override suspend fun register(registerData: RegisterModel): Token {
+        try {
 
             val response = if (registerData.avatar == null) {
-                PostsApi.retrofitService.registerUser(
+                apiService.registerUser(
                     registerData.login,
                     registerData.password,
                     registerData.name
                 )
             } else {
-                PostsApi.retrofitService.registerWithPhoto(
+                apiService.registerWithPhoto(
                     registerData.login.toRequestBody("text/plain".toMediaType()),
                     registerData.password.toRequestBody("text/plain".toMediaType()),
                     registerData.name.toRequestBody("text/plain".toMediaType()),
@@ -67,16 +76,21 @@ class AuthRepositoryImpl : AuthRepository {
             if (!response.isSuccessful) {
                 throw RuntimeException(response.errorBody()?.string())
             }
-            val authData = response.body() ?: throw RuntimeException("body is null")
+            val authResponse = response.body() ?: throw RuntimeException("body is null")
 
 
-             if (authData.token != null) {
-                 //Token(id = authData.id, token = it, authData.avatar.orEmpty())
-                 AppAuth.getInstance().setAuth(id = authData.id, token = authData.token)
-             } else
-             {
-                 throw RegisterError
-             }
+            if (authResponse.token != null) {
+                //Token(id = authData.id, token = it, authData.avatar.orEmpty())
+                //DependencyContainer.getInstance().appAuth.setAuth(id = authData.id, token = authData.token)
+                //appAuth.setAuth(id = authData.id, token = authData.token)
+                return Token(
+                    id = authResponse.id,
+                    token = authResponse.token,
+                    authResponse.avatar.orEmpty()
+                )
+            } else {
+                throw RegisterError
+            }
 
         } catch (e: IOException) {
             throw NetworkError

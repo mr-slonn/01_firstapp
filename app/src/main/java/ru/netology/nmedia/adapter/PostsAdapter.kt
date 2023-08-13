@@ -35,7 +35,7 @@ interface OnInteractionListener {
 
 class PostsAdapter(
     private val onInteractionListener: OnInteractionListener,
-    private val authorized:Boolean
+    private val authorized: Boolean
 ) :
     ListAdapter<Post, PostViewHolder>(PostDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -54,7 +54,7 @@ class PostsAdapter(
 class PostViewHolder(
     private val binding: CardPostBinding,
     private val onInteractionListener: OnInteractionListener,
-    private val authorized:Boolean
+    private val authorized: Boolean
 
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(post: Post) {

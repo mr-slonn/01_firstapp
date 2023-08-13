@@ -12,16 +12,22 @@ import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
+import javax.inject.Inject
+//import ru.netology.nmedia.di.DependencyContainer
 import kotlin.random.Random
 
-
+@AndroidEntryPoint
 class FCMService : FirebaseMessagingService() {
     private val action = "action"
     private val content = "content"
     private val channelId = "remote"
     private val gson = Gson()
+
+    @Inject
+    lateinit var appAuth: AppAuth
 
     override fun onCreate() {
         super.onCreate()
@@ -62,17 +68,17 @@ class FCMService : FirebaseMessagingService() {
             }
         }
         message.data[content]?.let {
-                handlePush(
-                    gson.fromJson(
-                        message.data[content],
-                        Push::class.java
-                    )
+            handlePush(
+                gson.fromJson(
+                    message.data[content],
+                    Push::class.java
                 )
+            )
         }
     }
 
     override fun onNewToken(token: String) {
-        AppAuth.getInstance().sendPushToken(token)
+        appAuth.sendPushToken(token)
     }
 
     private fun handleLike(content: Like) {
@@ -148,37 +154,50 @@ class FCMService : FirebaseMessagingService() {
     private fun handlePush(push: Push) {
 
         //если recipientId = тому, что в AppAuth, то всё ok, показываете Notification;
-        if (AppAuth.getInstance().data.value.id == push.recipientId || push.recipientId == null) {
+        if (appAuth.data.value.id == push.recipientId || push.recipientId == null) {
 
 
+            val contentTitle = if (appAuth.data.value.id == push.recipientId) {
+                "Вам сообщение!"
+            } else {
+                "Всем всем всем!"
+            }
+
+            val contentText = if (push.content.length > 80) {
+                "${push.content.substring(0, 80)}..."
+            } else {
+                push.content
+            }
             val notification = NotificationCompat.Builder(this, channelId)
                 .setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle(push.content)
+                .setContentTitle(contentTitle)
+                .setContentText(contentText)
+                .setStyle(
+                    NotificationCompat.BigTextStyle()
+                        .bigText(push.content)
+                )
+
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .build()
 
 
-//           НЕ РАБОТАЕТ С ЭТОЙ ПРОВЕРКОЙ
-//            if (ActivityCompat.checkSelfPermission(
-//                    this,
-//                    Manifest.permission.POST_NOTIFICATIONS
-//                ) != PackageManager.PERMISSION_GRANTED
-//            ) {
-//                // TODO: Consider calling
-//                //    ActivityCompat#requestPermissions
-//                // here to request the missing permissions, and then overriding
-//                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//                //                                          int[] grantResults)
-//                // to handle the case where the user grants the permission. See the documentation
-//                // for ActivityCompat#requestPermissions for more details.
-//                return
-//            }
-            NotificationManagerCompat.from(this).notify(Random.nextInt(100_000), notification)
+            if (
+                Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+                checkSelfPermission(
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                NotificationManagerCompat.from(this)
+                    .notify(Random.nextInt(100_000), notification)
+            }
+
+
         }
         //если recipientId = 0 (и не равен вашему), сервер считает, что у вас анонимная аутентификация и вам нужно переотправить свой push token;
 
         else if (push.recipientId == 0L || push.recipientId != 0L) {
-            AppAuth.getInstance().sendPushToken()
+            //DependencyContainer.getInstance().appAuth.sendPushToken()
+            appAuth.sendPushToken()
         }
     }
 

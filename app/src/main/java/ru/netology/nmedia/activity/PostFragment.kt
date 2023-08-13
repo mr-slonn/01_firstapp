@@ -13,14 +13,17 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
+
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.mediaArg
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
 
 import ru.netology.nmedia.databinding.FragmentPostBinding
+//import ru.netology.nmedia.di.DependencyContainer
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.services.Services
 import ru.netology.nmedia.util.loadAvatar
@@ -28,7 +31,9 @@ import ru.netology.nmedia.util.loadMediaAttachment
 import ru.netology.nmedia.viewmodel.AuthViewModel
 import ru.netology.nmedia.viewmodel.PostViewModel
 
+//import ru.netology.nmedia.viewmodel.ViewModelFactory
 
+@AndroidEntryPoint
 class PostFragment : Fragment() {
 
 //    companion object {
@@ -36,13 +41,40 @@ class PostFragment : Fragment() {
 //        var Bundle.mediaArg: String? by StringArg
 //    }
 
-    private val viewModel: PostViewModel by viewModels(
-        ownerProducer = ::requireParentFragment
-    )
+//    private val viewModel: PostViewModel by viewModels(
+//        ownerProducer = ::requireParentFragment
+//    )
+//
+//    private val authViewModel: AuthViewModel by viewModels(
+//        ownerProducer = ::requireParentFragment
+//    )
 
-    private val authViewModel: AuthViewModel by viewModels(
-        ownerProducer = ::requireParentFragment
-    )
+//    private val dependencyContainer = DependencyContainer.getInstance()
+//
+//    private val viewModel: PostViewModel by viewModels(
+//        ownerProducer = ::requireParentFragment,
+//        factoryProducer = {
+//            ViewModelFactory(dependencyContainer.repository,dependencyContainer.appAuth, dependencyContainer.authRepository)
+//        }
+//    )
+//
+//    private val authViewModel: AuthViewModel by viewModels(
+//        ownerProducer = ::requireParentFragment,
+//        factoryProducer = {
+//            ViewModelFactory(dependencyContainer.repository,dependencyContainer.appAuth, dependencyContainer.authRepository)
+//        }
+//    )
+
+//        private val viewModel: PostViewModel by viewModels(
+//        ownerProducer = ::requireParentFragment
+//    )
+
+    private val viewModel: PostViewModel by activityViewModels()
+
+    //    private val authViewModel: AuthViewModel by viewModels(
+//        ownerProducer = ::requireParentFragment
+//    )
+    private val authViewModel: AuthViewModel by activityViewModels()
 
     private var authorized = false
 
@@ -61,7 +93,6 @@ class PostFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
 
 
         _binding = FragmentPostBinding.inflate(inflater, container, false)
@@ -189,39 +220,37 @@ class PostFragment : Fragment() {
                         startActivity(shareIntent)
                     }
 
-                   like.isCheckable = authorized
+                    like.isCheckable = authorized
 
                     like.setOnClickListener {
 
                         if (authorized) {
                             viewModel.likeByIdFromPostV2()
-                        }
-                        else
-                        {
+                        } else {
                             val builder = AlertDialog.Builder(context)
                             //set title for alert dialog
                             builder.setTitle(R.string.account)
                             //set message for alert dialog
 
-                            builder.setMessage(R.string.confirm_log_in )
+                            builder.setMessage(R.string.confirm_log_in)
                             builder.setIcon(R.drawable.baseline_login_24)
 
 
-                                builder.setPositiveButton(R.string.sign_auth) { _, _ ->
-                                    findNavController().navigate(
-                                        R.id.action_feedFragment_to_logInFragment,
-                                        Bundle().apply {
-                                            textArg = "signin"
-                                        })
-                                }
+                            builder.setPositiveButton(R.string.sign_auth) { _, _ ->
+                                findNavController().navigate(
+                                    R.id.action_feedFragment_to_logInFragment,
+                                    Bundle().apply {
+                                        textArg = "signin"
+                                    })
+                            }
 
-                                builder.setNegativeButton(R.string.sign_up) { _, _ ->
-                                    findNavController().navigate(
-                                        R.id.action_feedFragment_to_logInFragment,
-                                        Bundle().apply {
-                                            textArg = "signup"
-                                        })
-                                }
+                            builder.setNegativeButton(R.string.sign_up) { _, _ ->
+                                findNavController().navigate(
+                                    R.id.action_feedFragment_to_logInFragment,
+                                    Bundle().apply {
+                                        textArg = "signup"
+                                    })
+                            }
 
 
                             //performing cancel action
@@ -262,10 +291,12 @@ class PostFragment : Fragment() {
                                             R.id.action_PostFragment_to_newPostFragment2,
                                             Bundle().apply {
                                                 textArg = state.post.content
-                                                mediaArg = state.post.attachment?.url},
-                                            )
+                                                mediaArg = state.post.attachment?.url
+                                            },
+                                        )
                                         true
                                     }
+
                                     else -> false
                                 }
                             }

@@ -22,30 +22,33 @@ import ru.netology.nmedia.enumeration.AttachmentType
 import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.error.AppError
 import ru.netology.nmedia.model.PhotoModel
+import javax.inject.Inject
 
 
-class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
+class PostRepositoryImpl @Inject constructor(
+    private val dao: PostDao,
+    private val apiService: ApiService
+) : PostRepository {
 
     override val data: Flow<List<Post>> = dao.getAll().map {
         it.map(PostEntity::toDto)
     }
 
 
-
     // override val data = dao.getAll().map(List<PostEntity>::toListDto)
 
     override suspend fun getAttachmentUrl(fileName: String): String {
-        return PostsApi.retrofitService.getAttachmentUrl(fileName)
+        return apiService.getAttachmentUrl(fileName)
     }
 
     override suspend fun getAvatarUrl(fileName: String): String {
-        return PostsApi.retrofitService.getAvatarUrl(fileName)
+        return apiService.getAvatarUrl(fileName)
     }
 
 //    override fun getNewerCount(id: Long): Flow<Int> = flow {
 //        while (true) {
 //            delay(10_000L)
-//            val response = PostsApi.service.getNewer(id)
+//            val response = apiService.getNewer(id)
 //            if (!response.isSuccessful) {
 //                throw ApiError(response.code(), response.message())
 //            }
@@ -63,7 +66,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
         while (true) {
             try {
                 delay(10_000L)
-                val response = PostsApi.retrofitService.getNewer(id)
+                val response = apiService.getNewer(id)
                 val posts = response.body().orEmpty()
                 emit(posts.size)
                 dao.insert(posts.toEntity().map { it.copy(hidden = true) })
@@ -75,12 +78,14 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
             }
         }
     }
-//    override suspend fun saveWithAttachment(post: Post, upload: MediaUpload) {
+
+    //    override suspend fun saveWithAttachment(post: Post, upload: MediaUpload) {
     override suspend fun saveWithAttachment(post: Post, upload: PhotoModel) {
         try {
             val media = upload(upload)
             // TODO: add support for other types
-            val postWithAttachment = post.copy(attachment = Attachment(media.id, AttachmentType.IMAGE))
+            val postWithAttachment =
+                post.copy(attachment = Attachment(media.id, AttachmentType.IMAGE))
             save(postWithAttachment)
         } catch (e: AppError) {
             throw e
@@ -90,14 +95,15 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
             throw UnknownError
         }
     }
-// override suspend fun upload(upload: MediaUpload): Media {
+
+    // override suspend fun upload(upload: MediaUpload): Media {
     override suspend fun upload(upload: PhotoModel): Media {
         try {
             val media = MultipartBody.Part.createFormData(
                 "file", upload.file.name, upload.file.asRequestBody()
             )
 
-            val response = PostsApi.retrofitService.upload(media)
+            val response = apiService.upload(media)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -125,7 +131,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
 
     override suspend fun getAll() {
         try {
-            val response = PostsApi.retrofitService.getAll()
+            val response = apiService.getAll()
             if (!response.isSuccessful) {
                 throw RuntimeException(response.errorBody()?.string())
             }
@@ -140,7 +146,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
 
     override suspend fun getById(id: Long): Post {
         return try {
-            val response = PostsApi.retrofitService.getById(id)
+            val response = apiService.getById(id)
             if (!response.isSuccessful) {
                 throw RuntimeException(response.errorBody()?.string())
             }
@@ -156,7 +162,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
 
     override suspend fun likeById(id: Long): Post {
         dao.likeById(id)
-        val response = PostsApi.retrofitService.likeById(id)
+        val response = apiService.likeById(id)
         if (!response.isSuccessful) {
             throw RuntimeException(response.errorBody()?.string())
         }
@@ -167,7 +173,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
 
     override suspend fun unLikeById(id: Long): Post {
         dao.likeById(id)
-        val response = PostsApi.retrofitService.dislikeById(id)
+        val response = apiService.dislikeById(id)
         if (!response.isSuccessful) {
             throw RuntimeException(response.errorBody()?.string())
         }
@@ -178,7 +184,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
 
     override suspend fun removeById(id: Long) {
         dao.removeById(id)
-        val response = PostsApi.retrofitService.removeById(id)
+        val response = apiService.removeById(id)
         if (!response.isSuccessful) {
             throw RuntimeException(response.errorBody()?.string())
         }
@@ -187,7 +193,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
 
     override suspend fun save(post: Post) {
         try {
-            val response = PostsApi.retrofitService.save(post)
+            val response = apiService.save(post)
             if (!response.isSuccessful) {
                 throw RuntimeException(response.errorBody()?.string())
             }

@@ -1,19 +1,20 @@
 package ru.netology.nmedia.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.auth.AppAuth
-import ru.netology.nmedia.db.AppDb
+
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
 import ru.netology.nmedia.model.FeedModelState
@@ -21,8 +22,9 @@ import ru.netology.nmedia.model.PhotoModel
 import ru.netology.nmedia.model.PostModel
 import ru.netology.nmedia.model.PostModelState
 import ru.netology.nmedia.repository.PostRepository
-import ru.netology.nmedia.repository.PostRepositoryImpl
+
 import ru.netology.nmedia.util.SingleLiveEvent
+import javax.inject.Inject
 
 
 private val empty = Post(
@@ -39,12 +41,12 @@ private val empty = Post(
 )
 
 //private val noPhoto = PhotoModel()
+@HiltViewModel
+class PostViewModel @Inject constructor(
+    private val repository: PostRepository,
+    private val appAuth: AppAuth,
+) : ViewModel() {
 
-class PostViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository: PostRepository =
-        PostRepositoryImpl(
-            AppDb.getInstance(application).postDao()
-        )
 
     private val _dataState = MutableLiveData(FeedModelState())
     private val _postState = MutableLiveData(PostModelState())
@@ -70,7 +72,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 //        }.asLiveData(Dispatchers.Default)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val data: LiveData<FeedModel> = AppAuth.getInstance()
+    val data: LiveData<FeedModel> = appAuth
         .data
         .flatMapLatest { token ->
             repository.data.map { posts ->
@@ -147,7 +149,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             _postState.value = PostModelState(refreshing = true)
             _post.value?.post?.let {
                 val post = repository.getById(it.id)
-                _post.postValue(PostModel(post = post.copy(ownedByMe = it.authorId == AppAuth.getInstance().data.value.id)))
+                _post.postValue(PostModel(post = post.copy(ownedByMe = it.authorId == appAuth.data.value.id)))
             }
             _postState.value = PostModelState()
         } catch (e: Exception) {
@@ -204,7 +206,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 _postState.value = PostModelState(loading = true)
                 val post = repository.getById(id)
-                _post.postValue(PostModel(post.copy(ownedByMe = post.authorId == AppAuth.getInstance().data.value.id)))
+                _post.postValue(PostModel(post.copy(ownedByMe = post.authorId == appAuth.data.value.id)))
 
                 _postState.value = PostModelState()
             } catch (e: Exception) {

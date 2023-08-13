@@ -1,18 +1,67 @@
 package ru.netology.nmedia.activity
 
 import android.content.Intent
-import android.os.Bundle
+import android.content.pm.PackageManager
+import android.os.Build
+
 import android.view.MenuItem
 import android.widget.Toast
+//import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+
 import androidx.navigation.findNavController
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
+import dagger.hilt.android.AndroidEntryPoint
+import android.Manifest
+import android.os.Bundle
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
+import ru.netology.nmedia.auth.AppAuth
+//import ru.netology.nmedia.di.DependencyContainer
+//import ru.netology.nmedia.viewmodel.AuthViewModel
+import javax.inject.Inject
 
+//import ru.netology.nmedia.viewmodel.ViewModelFactory
+
+@AndroidEntryPoint
 class AppActivity : AppCompatActivity(R.layout.activity_app) {
+
+//    private  val dependencyContainer = DependencyContainer.getInstance()
+//    private val viewModel: AuthViewModel by viewModels(
+//        factoryProducer = {
+//            ViewModelFactory(dependencyContainer.repository,dependencyContainer.appAuth, dependencyContainer.authRepository)
+//        }
+//    )
+
+    @Inject
+    lateinit var appAuth: AppAuth
+
+    @Inject
+    lateinit var googleApiAvailability: GoogleApiAvailability
+
+
+    @Inject
+    lateinit var firebaseMessaging: FirebaseMessaging
+
+
+   // private val viewModel: AuthViewModel by viewModels()
+
+
+    private fun requestNotificationsPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return
+        }
+
+        val permission = Manifest.permission.POST_NOTIFICATIONS
+
+        if (checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED) {
+            return
+        }
+
+        requestPermissions(arrayOf(permission), 1)
+    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle presses on the action bar menu items
@@ -28,6 +77,8 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        requestNotificationsPermission()
 
         intent?.let {
             if (it.action != Intent.ACTION_SEND) {
@@ -47,11 +98,24 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                 }
             )
         }
+
+        firebaseMessaging.token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                println("some stuff happened: ${task.exception}")
+                return@addOnCompleteListener
+            }
+
+            val token = task.result
+            println(token)
+        }
+
         checkGoogleApiAvailability()
+
     }
 
+
     private fun checkGoogleApiAvailability() {
-        with(GoogleApiAvailability.getInstance()) {
+        with(googleApiAvailability) {
             val code = isGooglePlayServicesAvailable(this@AppActivity)
             if (code == ConnectionResult.SUCCESS) {
                 return@with
@@ -60,12 +124,10 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                 getErrorDialog(this@AppActivity, code, 9000)?.show()
                 return
             }
-            Toast.makeText(this@AppActivity, R.string.google_play_unavailable, Toast.LENGTH_LONG)
-                .show()
+            Toast.makeText(this@AppActivity, "Google Api Unavailable", Toast.LENGTH_LONG).show()
         }
-
-        FirebaseMessaging.getInstance().token.addOnSuccessListener {
-            println(it)
-        }
+//        firebaseMessaging.token.addOnSuccessListener {
+//           println(it)
+//        }
     }
 }
