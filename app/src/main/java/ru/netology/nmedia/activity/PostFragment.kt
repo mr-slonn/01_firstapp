@@ -238,7 +238,7 @@ class PostFragment : Fragment() {
 
                             builder.setPositiveButton(R.string.sign_auth) { _, _ ->
                                 findNavController().navigate(
-                                    R.id.action_feedFragment_to_logInFragment,
+                                    R.id.action_PostFragment_to_logInFragment,
                                     Bundle().apply {
                                         textArg = "signin"
                                     })
@@ -246,7 +246,7 @@ class PostFragment : Fragment() {
 
                             builder.setNegativeButton(R.string.sign_up) { _, _ ->
                                 findNavController().navigate(
-                                    R.id.action_feedFragment_to_logInFragment,
+                                    R.id.action_PostFragment_to_logInFragment,
                                     Bundle().apply {
                                         textArg = "signup"
                                     })

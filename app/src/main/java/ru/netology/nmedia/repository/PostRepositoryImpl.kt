@@ -1,9 +1,12 @@
 package ru.netology.nmedia.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import kotlinx.coroutines.CancellationException
 
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.map
+
 import ru.netology.nmedia.api.*
 import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.dto.Post
@@ -30,9 +33,23 @@ class PostRepositoryImpl @Inject constructor(
     private val apiService: ApiService
 ) : PostRepository {
 
-    override val data: Flow<List<Post>> = dao.getAll().map {
-        it.map(PostEntity::toDto)
-    }
+//    override val data: Flow<List<Post>> = dao.getAll().map {
+//        it.map(PostEntity::toDto)
+//    }
+
+//    override val data: Flow<PagingData<Post>> = Pager(
+//        config = PagingConfig(pageSize = 5, enablePlaceholders = false),
+//        pagingSourceFactory = {
+//            PostPagingSource(
+//                apiService
+//            )
+//                              },
+//    ).flow
+
+    override val data: Flow<PagingData<Post>> = Pager(
+        config = PagingConfig(pageSize = 5, enablePlaceholders = false),
+        pagingSourceFactory = { PostPagingSource(apiService) },
+    ).flow
 
 
     // override val data = dao.getAll().map(List<PostEntity>::toListDto)

@@ -62,15 +62,15 @@ class MainActivity : AppCompatActivity() {
         binding.list.adapter = adapter
 
 
-        viewModel.data.observe(this) { state ->
-            val isNewPost = adapter.currentList.size < state.posts.size
-            adapter.submitList(state.posts)
-            {
-                if (isNewPost) {
-                    binding.list.smoothScrollToPosition(0)
-                }
-            }
-        }
+//        viewModel.data.observe(this) { state ->
+//            val isNewPost = adapter.currentList.size < state.posts.size
+//            adapter.submitList(state.posts)
+//            {
+//                if (isNewPost) {
+//                    binding.list.smoothScrollToPosition(0)
+//                }
+//            }
+//        }
 
 
         val newPostLauncher = registerForActivityResult(NewPostResultContract()) { result ->

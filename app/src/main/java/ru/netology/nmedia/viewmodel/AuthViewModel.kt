@@ -25,8 +25,8 @@ class AuthViewModel @Inject constructor(
     private val appAuth: AppAuth,
 ) : ViewModel() {
 
-//    val authorized: Boolean
-//        get() = appAuth.data.value.token != null
+  // val authorized: Boolean
+   //    get() = appAuth.data.value.token != null
 //    val data: LiveData<Token> = appAuth.data.asLiveData()
 
 

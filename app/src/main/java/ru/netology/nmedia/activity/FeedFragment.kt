@@ -4,7 +4,7 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
+//import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
@@ -16,10 +16,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
+
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.mediaArg
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
@@ -96,6 +103,7 @@ class FeedFragment : Fragment() {
         } else {
             builder.setPositiveButton(R.string.sign_out) { _, _ ->
                 appAuth.removeAuth()
+
             }
         }
 
@@ -119,7 +127,7 @@ class FeedFragment : Fragment() {
     ): View {
 
 
-        var authorized = false
+      // var authorized = false
 
         val actionBar = (activity as AppCompatActivity).supportActionBar
         actionBar?.setDisplayShowHomeEnabled(false)
@@ -139,7 +147,7 @@ class FeedFragment : Fragment() {
 
                 override fun onLike(post: Post) {
 
-                    if (!authorized) {
+                    if (!authViewModel.authorized) {
                         showDialog(true)
                     } else {
                         viewModel.likeByIdV2(post)
@@ -185,7 +193,7 @@ class FeedFragment : Fragment() {
                             mediaArg = post.attachment?.url
                         })
                 }
-            }, authorized
+            }, authViewModel.authorized
         )
         binding.list.adapter = adapter
         viewModel.dataState.observe(viewLifecycleOwner) { state ->
@@ -202,9 +210,28 @@ class FeedFragment : Fragment() {
             }
         }
 
-        viewModel.data.observe(viewLifecycleOwner) { state ->
-            adapter.submitList(state.posts)
-            binding.emptyText.isVisible = state.empty
+//        viewModel.data.observe(viewLifecycleOwner) { state ->
+//            adapter.submitList(state.posts)
+//            binding.emptyText.isVisible = state.empty
+//        }
+
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.data.collectLatest(adapter::submitData)
+            }
+        }
+
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                adapter.loadStateFlow.collectLatest { state ->
+                    binding.swipeRefresh.isRefreshing =
+                        state.refresh is LoadState.Loading ||
+                                state.prepend is LoadState.Loading ||
+                                state.append is LoadState.Loading
+                }
+            }
         }
 
         binding.retryButton.setOnClickListener {
@@ -214,7 +241,7 @@ class FeedFragment : Fragment() {
 
         binding.fab.setOnClickListener {
 
-            if (!authorized) {
+            if (!authViewModel.authorized) {
                 showDialog(true)
             } else {
                 findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
@@ -234,19 +261,19 @@ class FeedFragment : Fragment() {
             }
         }
 
-        viewModel.newerCount.observe(viewLifecycleOwner) { state ->
-            Log.d("FeedFragment", "New count: $state")
-            if (state != 0 && binding.retryButton.visibility == View.GONE) {
-                binding.reloadNewPosts.isVisible = true
-            }
-        }
-
-
         binding.reloadNewPosts.setOnClickListener {
             viewModel.showHiddenPosts()
             binding.list.smoothScrollToPosition(0)
             it.isVisible = false
         }
+
+//        viewModel.newerCount.observe(viewLifecycleOwner) { state ->
+//            Log.d("FeedFragment", "New count: $state")
+//            if (state != 0 && binding.retryButton.visibility == View.GONE) {
+//                binding.reloadNewPosts.isVisible = true
+//            }
+//        }
+
 
 //        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
 //            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
@@ -256,17 +283,19 @@ class FeedFragment : Fragment() {
 //            }
 //        })
 
-        binding.swipeRefresh.setOnRefreshListener {
-            viewModel.refreshPosts()
 
-        }
+//        binding.swipeRefresh.setOnRefreshListener {
+//           viewModel.refreshPosts()
+//        }
+
+        binding.swipeRefresh.setOnRefreshListener(adapter::refresh)
 
 //        val authViewModel: AuthViewModel by viewModels()
         var currentMenuProvider: MenuProvider? = null
 
+        authViewModel.data.observe(viewLifecycleOwner) {
 
-        authViewModel.data.observe(viewLifecycleOwner) { token ->
-            authorized = token.token != null
+           adapter.refresh()
 
             currentMenuProvider?.let {
                 requireActivity().removeMenuProvider(it)
@@ -275,8 +304,8 @@ class FeedFragment : Fragment() {
                 object : MenuProvider {
                     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                         menuInflater.inflate(R.menu.menu_main, menu)
-                        menu.setGroupVisible(R.id.unauthenticated, !authorized)
-                        menu.setGroupVisible(R.id.authenticated, authorized)
+                        menu.setGroupVisible(R.id.unauthenticated, !authViewModel.authorized)
+                        menu.setGroupVisible(R.id.authenticated, authViewModel.authorized)
                     }
 
                     override fun onMenuItemSelected(menuItem: MenuItem): Boolean =

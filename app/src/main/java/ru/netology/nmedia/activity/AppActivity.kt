@@ -15,13 +15,20 @@ import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import android.Manifest
+
 import android.os.Bundle
+
+import androidx.activity.viewModels
+
+
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
-import ru.netology.nmedia.auth.AppAuth
+
+import ru.netology.nmedia.viewmodel.AuthViewModel
 //import ru.netology.nmedia.di.DependencyContainer
 //import ru.netology.nmedia.viewmodel.AuthViewModel
 import javax.inject.Inject
+
 
 //import ru.netology.nmedia.viewmodel.ViewModelFactory
 
@@ -35,8 +42,9 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
 //        }
 //    )
 
-    @Inject
-    lateinit var appAuth: AppAuth
+//    @Inject
+//    lateinit var appAuth: AppAuth
+    private val viewModel: AuthViewModel by viewModels()
 
     @Inject
     lateinit var googleApiAvailability: GoogleApiAvailability
@@ -75,6 +83,8 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
     }
 
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -92,7 +102,6 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
             intent.removeExtra(Intent.EXTRA_TEXT)
             findNavController(R.id.nav_host_fragment).navigate(
                 R.id.action_feedFragment_to_newPostFragment,
-
                 Bundle().apply {
                     textArg = text
                 }
@@ -109,7 +118,50 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
             println(token)
         }
 
+        viewModel.data.observe(this) {
+            invalidateOptionsMenu()
+        }
+
         checkGoogleApiAvailability()
+
+//        addMenuProvider(object : MenuProvider {
+//            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+//                menuInflater.inflate(R.menu.menu_main, menu)
+//
+//                menu.let {
+//                    it.setGroupVisible(R.id.unauthenticated, !viewModel.authorized)
+//                    it.setGroupVisible(R.id.authenticated, viewModel.authorized)
+//                }
+//            }
+//
+//            override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
+//                when (menuItem.itemId) {
+//                    R.id.signin -> {
+//                        findNavController().navigate(
+//                                    R.id.action_feedFragment_to_logInFragment,
+//                                    Bundle().apply {
+//                                        textArg = "signin"
+//                                    })
+//                                true
+//                        true
+//                    }
+//                    R.id.signup -> {
+//                        findNavController().navigate(
+//                                    R.id.action_feedFragment_to_logInFragment,
+//                                    Bundle().apply {
+//                                        textArg = "signup"
+//                                    })
+//                                true
+//                    }
+//                    R.id.signout -> {
+//                        showDialog(false)
+//                                //AppAuth.getInstance().removeAuth()
+//                                true
+//                    }
+//                    else -> false
+//                }
+//
+//        })
 
     }
 

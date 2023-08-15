@@ -12,6 +12,7 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -32,8 +33,8 @@ class AppAuth @Inject constructor(
     private val tokenKey = "token"
 
     //private val _authStateFlow: MutableStateFlow<AuthState>
-    private val _data = MutableStateFlow(Token())
-    val data = _data.asStateFlow()
+   private val _data = MutableStateFlow(Token())
+
 
     init {
         val token = prefs.getString(tokenKey, null)
@@ -46,21 +47,27 @@ class AppAuth @Inject constructor(
         } else {
             _data.value = Token(id = id, token = token)
         }
-        sendPushToken()
 
 
-//        if (id == 0L || token == null) {
+
+//        val id = prefs.getLong(idKey, 0)
+//        val token = prefs.getString(tokenKey, null)
 //
+//        if (id == 0L || token == null) {
+//           _data = MutableStateFlow(Token())
 //            _authStateFlow = MutableStateFlow(AuthState())
 //            with(prefs.edit()) {
-//               clear()
-//               apply()
-//           }
+//                clear()
+//                apply()
+//            }
 //        } else {
-//            _authStateFlow = MutableStateFlow(AuthState(id, token))
+//           _data = MutableStateFlow(Token(id, token))
+//         //   _authStateFlow = MutableStateFlow(AuthState(id, token))
 //        }
+        sendPushToken()
     }
 
+    val data : StateFlow<Token> = _data.asStateFlow()
     //val authStateFlow: StateFlow<AuthState> = _authStateFlow.asStateFlow()
 
     // @Synchronized
@@ -75,21 +82,33 @@ class AppAuth @Inject constructor(
             putLong(idKey, id)
             putString(tokenKey, token)
         }
-        _data.value = Token(id = id, token = token)
+       _data.value = Token(id = id, token = token)
+       // _authStateFlow.value = AuthState(id, token)
         sendPushToken()
     }
 
     // @Synchronized
-    fun removeAuth() {
-//        _authStateFlow.value = AuthState()
-//        with(prefs.edit()) {
+//    fun removeAuth() {
+////        _authStateFlow.value = AuthState()
+////        with(prefs.edit()) {
+////            clear()
+////            commit()
+////        }
+//        prefs.edit {
 //            clear()
-//            commit()
 //        }
-        prefs.edit {
-            clear()
-        }
+//        _data.value = Token()
+//       // _authStateFlow.value = AuthState()
+//        sendPushToken()
+//    }
+
+    @Synchronized
+    fun removeAuth() {
         _data.value = Token()
+        with(prefs.edit()) {
+            clear()
+            apply()
+        }
         sendPushToken()
     }
 
