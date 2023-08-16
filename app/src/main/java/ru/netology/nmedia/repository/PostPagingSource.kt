@@ -59,6 +59,7 @@ class PostPagingSource(
                     prevKey = params.key,
                     nextKey = null
                 )
+
                 is LoadParams.Append -> service.getBefore(params.key, params.loadSize)
             }
 

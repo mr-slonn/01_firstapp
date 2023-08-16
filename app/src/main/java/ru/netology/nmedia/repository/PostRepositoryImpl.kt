@@ -1,8 +1,10 @@
 package ru.netology.nmedia.repository
 
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.map
 import kotlinx.coroutines.CancellationException
 
 import kotlinx.coroutines.delay
@@ -18,6 +20,8 @@ import java.lang.RuntimeException
 import kotlinx.coroutines.flow.*
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import ru.netology.nmedia.dao.PostRemoteKeyDao
+import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.entity.toEntity
@@ -26,10 +30,13 @@ import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.error.AppError
 import ru.netology.nmedia.model.PhotoModel
 import javax.inject.Inject
+import javax.inject.Singleton
 
-
+@Singleton
 class PostRepositoryImpl @Inject constructor(
+    appDb: AppDb,
     private val dao: PostDao,
+    postRemoteKeyDao: PostRemoteKeyDao,
     private val apiService: ApiService
 ) : PostRepository {
 
@@ -46,10 +53,25 @@ class PostRepositoryImpl @Inject constructor(
 //                              },
 //    ).flow
 
+//    override val data: Flow<PagingData<Post>> = Pager(
+//        config = PagingConfig(pageSize = 5, enablePlaceholders = false),
+//        pagingSourceFactory = { PostPagingSource(apiService) },
+//    ).flow
+
+    @OptIn(ExperimentalPagingApi::class)
     override val data: Flow<PagingData<Post>> = Pager(
         config = PagingConfig(pageSize = 5, enablePlaceholders = false),
-        pagingSourceFactory = { PostPagingSource(apiService) },
-    ).flow
+        pagingSourceFactory = { dao.pagingSource() },
+        remoteMediator = PostRemoteMediator(
+            service = apiService,
+            postDao = dao,
+            postRemoteKeyDao = postRemoteKeyDao,
+            db = appDb
+        )
+    ).flow.map {
+        // it.map { it.toDto() }
+        it.map(PostEntity::toDto)
+    }
 
 
     // override val data = dao.getAll().map(List<PostEntity>::toListDto)

@@ -38,7 +38,11 @@ class AuthRepositoryImpl @Inject constructor(
                 //Token(id = authData.id, token = it, authData.avatar.orEmpty())
                 // DependencyContainer.getInstance().appAuth.setAuth(id = authData.id, token = authData.token)
                 //appAuth.setAuth(id = authData.id, token = authData.token)
-                return Token(id = authResponse.id, token = authResponse.token, authResponse.avatar.orEmpty())
+                return Token(
+                    id = authResponse.id,
+                    token = authResponse.token,
+                    authResponse.avatar.orEmpty()
+                )
             } else {
                 throw AuthError
             }

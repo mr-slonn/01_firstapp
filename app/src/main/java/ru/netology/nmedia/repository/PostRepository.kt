@@ -8,7 +8,7 @@ import ru.netology.nmedia.model.PhotoModel
 
 interface PostRepository {
 
-   // val data: Flow<List<Post>>
+    // val data: Flow<List<Post>>
 
     val data: Flow<PagingData<Post>>
 

@@ -33,7 +33,7 @@ class AppAuth @Inject constructor(
     private val tokenKey = "token"
 
     //private val _authStateFlow: MutableStateFlow<AuthState>
-   private val _data = MutableStateFlow(Token())
+    private val _data = MutableStateFlow(Token())
 
 
     init {
@@ -47,7 +47,6 @@ class AppAuth @Inject constructor(
         } else {
             _data.value = Token(id = id, token = token)
         }
-
 
 
 //        val id = prefs.getLong(idKey, 0)
@@ -67,7 +66,7 @@ class AppAuth @Inject constructor(
         sendPushToken()
     }
 
-    val data : StateFlow<Token> = _data.asStateFlow()
+    val data: StateFlow<Token> = _data.asStateFlow()
     //val authStateFlow: StateFlow<AuthState> = _authStateFlow.asStateFlow()
 
     // @Synchronized
@@ -82,8 +81,8 @@ class AppAuth @Inject constructor(
             putLong(idKey, id)
             putString(tokenKey, token)
         }
-       _data.value = Token(id = id, token = token)
-       // _authStateFlow.value = AuthState(id, token)
+        _data.value = Token(id = id, token = token)
+        // _authStateFlow.value = AuthState(id, token)
         sendPushToken()
     }
 

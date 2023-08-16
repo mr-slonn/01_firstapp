@@ -42,7 +42,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
 //        }
 //    )
 
-//    @Inject
+    //    @Inject
 //    lateinit var appAuth: AppAuth
     private val viewModel: AuthViewModel by viewModels()
 
@@ -54,7 +54,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
     lateinit var firebaseMessaging: FirebaseMessaging
 
 
-   // private val viewModel: AuthViewModel by viewModels()
+    // private val viewModel: AuthViewModel by viewModels()
 
 
     private fun requestNotificationsPermission() {
@@ -81,8 +81,6 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
         }
         return super.onOptionsItemSelected(item)
     }
-
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

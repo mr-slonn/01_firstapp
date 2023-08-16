@@ -127,7 +127,7 @@ class FeedFragment : Fragment() {
     ): View {
 
 
-      // var authorized = false
+        // var authorized = false
 
         val actionBar = (activity as AppCompatActivity).supportActionBar
         actionBar?.setDisplayShowHomeEnabled(false)
@@ -293,10 +293,16 @@ class FeedFragment : Fragment() {
 //        val authViewModel: AuthViewModel by viewModels()
         var currentMenuProvider: MenuProvider? = null
 
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                authViewModel.dataFlow.collect {
+                    adapter.refresh()
+                }
+            }
+        }
+
         authViewModel.data.observe(viewLifecycleOwner) {
-
-           adapter.refresh()
-
             currentMenuProvider?.let {
                 requireActivity().removeMenuProvider(it)
             }

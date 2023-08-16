@@ -8,6 +8,9 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.auth.AppAuth
 
@@ -25,8 +28,8 @@ class AuthViewModel @Inject constructor(
     private val appAuth: AppAuth,
 ) : ViewModel() {
 
-  // val authorized: Boolean
-   //    get() = appAuth.data.value.token != null
+    // val authorized: Boolean
+    //    get() = appAuth.data.value.token != null
 //    val data: LiveData<Token> = appAuth.data.asLiveData()
 
 
@@ -36,6 +39,10 @@ class AuthViewModel @Inject constructor(
         .asLiveData(Dispatchers.Default)
     val authorized: Boolean
         get() = appAuth.data.value.id != 0L
+
+
+    val dataFlow: Flow<Token> = appAuth.data
+        .shareIn(viewModelScope, SharingStarted.Lazily)
 
 
     private val _authState = MutableLiveData(AuthModelState())

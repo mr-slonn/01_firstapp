@@ -163,7 +163,7 @@ class PostFragment : Fragment() {
 
                     author.text = state.post.author
 
-                    published.text = state.post.published
+                    published.text = Services().getDateTime(state.post.published)
                     content.text = state.post.content
                     like.isChecked = state.post.likedByMe
                     like.text = Services().countWithSuffix(state.post.likes)
