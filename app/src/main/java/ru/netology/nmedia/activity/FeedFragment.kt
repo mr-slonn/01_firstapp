@@ -31,6 +31,7 @@ import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.mediaArg
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.adapter.OnInteractionListener
+import ru.netology.nmedia.adapter.PagingLoadStateAdapter
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.FragmentFeedBinding
@@ -195,16 +196,34 @@ class FeedFragment : Fragment() {
                 }
             }, authViewModel.authorized
         )
-        binding.list.adapter = adapter
+
+        val header = PagingLoadStateAdapter(object : PagingLoadStateAdapter.OnInteractionListener {
+            override fun onRetry() {
+                adapter.retry()
+            }
+        })
+        val footer = PagingLoadStateAdapter(object : PagingLoadStateAdapter.OnInteractionListener {
+            override fun onRetry() {
+                adapter.retry()
+            }
+        })
+
+        binding.list.adapter = adapter.withLoadStateHeaderAndFooter(
+            header = header,
+            footer = footer,
+        )
+
+
         viewModel.dataState.observe(viewLifecycleOwner) { state ->
-            binding.progress.isVisible = state.loading
-            binding.swipeRefresh.isRefreshing = state.refreshing
+            // binding.progress.isVisible = state.loading
+            //binding.swipeRefresh.isRefreshing = state.refreshing
             //binding.errorGroup.isVisible = state.error
 
             if (state.smallError || state.error) {
                 Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
                     .setAction(R.string.retry_loading) {
-                        viewModel.loadPosts()
+                        // viewModel.loadPosts()
+                        adapter.refresh()
                     }
                     .show()
             }
@@ -226,16 +245,30 @@ class FeedFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 adapter.loadStateFlow.collectLatest { state ->
+
+
+                    header.loadState = state.mediator
+                        ?.refresh
+                        ?.takeIf { it is LoadState.Error && adapter.itemCount > 0 }
+                        ?: state.prepend
+
+                    footer.loadState = state.mediator
+                        ?.refresh
+                        ?.takeIf { it is LoadState.Error && adapter.itemCount > 0 }
+                        ?: state.append
+
                     binding.swipeRefresh.isRefreshing =
-                        state.refresh is LoadState.Loading ||
-                                state.prepend is LoadState.Loading ||
-                                state.append is LoadState.Loading
+                        state.refresh is LoadState.Loading
+                    //||
+                    //   state.prepend is LoadState.Loading ||
+                    //   state.append is LoadState.Loading
                 }
             }
         }
 
         binding.retryButton.setOnClickListener {
-            viewModel.loadPosts()
+            // viewModel.loadPosts()
+            adapter.refresh()
         }
 
 

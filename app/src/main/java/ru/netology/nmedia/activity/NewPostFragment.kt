@@ -286,7 +286,8 @@ class NewPostFragment : Fragment() {
         }
 
         viewModel.postCreated.observe(viewLifecycleOwner) {
-            viewModel.loadPosts()
+            //viewModel.loadPosts()
+            //adapter.refresh()
             findNavController().navigateUp()
             actionBar?.title = getString(R.string.nmedia)
             actionBar?.setDisplayHomeAsUpEnabled(false)

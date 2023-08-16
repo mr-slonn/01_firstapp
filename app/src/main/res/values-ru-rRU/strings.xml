@@ -51,6 +51,6 @@
     <string name="access_log_out">Вы уверены что хотите выйти?</string>
     <string name="confirm_log_in">Вы не авторизованы, хотите авторизоваться и стать автором? </string>
     <string name="account">Учётная запись</string>
-
+    <string name="ad_description">Реклама</string>
 
 </resources>

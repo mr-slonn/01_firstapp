@@ -70,29 +70,31 @@ class PostRemoteMediator(
             db.withTransaction {
                 when (loadType) {
                     LoadType.REFRESH -> {
-                        postRemoteKeyDao.removeAll()
-                        postRemoteKeyDao.insert(
-                            listOf(
-                                PostRemoteKeyEntity(
-                                    type = PostRemoteKeyEntity.KeyType.AFTER,
-                                    id = body.first().id,
-                                ),
-                                PostRemoteKeyEntity(
-                                    type = PostRemoteKeyEntity.KeyType.BEFORE,
-                                    id = body.last().id,
-                                ),
-                            )
-                        )
-                        postDao.removeAll()
-                    }
-
-                    LoadType.PREPEND -> {
+                        //postRemoteKeyDao.removeAll()
                         postRemoteKeyDao.insert(
                             PostRemoteKeyEntity(
                                 type = PostRemoteKeyEntity.KeyType.AFTER,
                                 id = body.first().id,
                             )
                         )
+
+                        if (postDao.isEmpty()) {
+                            PostRemoteKeyEntity(
+                                type = PostRemoteKeyEntity.KeyType.BEFORE,
+                                id = body.last().id,
+                            )
+                        }
+
+                        // postDao.removeAll()
+                    }
+
+                    LoadType.PREPEND -> {
+//                        postRemoteKeyDao.insert(
+//                            PostRemoteKeyEntity(
+//                                type = PostRemoteKeyEntity.KeyType.AFTER,
+//                                id = body.first().id,
+//                            )
+//                        )
                     }
 
                     LoadType.APPEND -> {

@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.dto.FeedItem
 
 import ru.netology.nmedia.dto.Post
 
@@ -90,11 +91,15 @@ class PostViewModel @Inject constructor(
         .data
         .cachedIn(viewModelScope)
 
-    val data: Flow<PagingData<Post>> = appAuth.data
+    val data: Flow<PagingData<FeedItem>> = appAuth.data
         .flatMapLatest { (myId, _) ->
             cached.map { pagingData ->
                 pagingData.map { post ->
-                    post.copy(ownedByMe = post.authorId == myId)
+                    if (post is Post) {
+                        post.copy(ownedByMe = post.authorId == myId)
+                    } else {
+                        post
+                    }
                 }
             }
         }
@@ -138,7 +143,7 @@ class PostViewModel @Inject constructor(
 
 
     init {
-        loadPosts()
+        // loadPosts()
     }
 
     fun backPost() {
@@ -151,6 +156,7 @@ class PostViewModel @Inject constructor(
             try {
                 _dataState.value = FeedModelState(loading = true)
                 repository.getAll()
+
                 _dataState.value = FeedModelState()
             } catch (e: Exception) {
                 _dataState.value = FeedModelState(error = true)

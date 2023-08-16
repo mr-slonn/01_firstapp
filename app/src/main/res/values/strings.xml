@@ -50,6 +50,7 @@
     <string name="close">Close</string>
     <string name="confirm_log_in">You are not logged in, do you want to log in and become an author?</string>
     <string name="account">Account</string>
+    <string name="ad_description">ad</string>
 
 </resources>
 

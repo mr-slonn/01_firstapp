@@ -103,7 +103,8 @@ class PostFragment : Fragment() {
             actionBar?.setDisplayShowHomeEnabled(false)
             actionBar?.title = getString(R.string.nmedia)
             binding.cardPostScroll.visibility = View.GONE
-            viewModel.loadPosts()
+            //viewModel.loadPosts()
+            //adapter.refresh()
             viewModel.backPost()
             findNavController().navigateUp()
         }
