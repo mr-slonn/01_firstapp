@@ -79,12 +79,13 @@ class PostRemoteMediator(
                         )
 
                         if (postDao.isEmpty()) {
-                            PostRemoteKeyEntity(
-                                type = PostRemoteKeyEntity.KeyType.BEFORE,
-                                id = body.last().id,
+                            postRemoteKeyDao.insert(
+                                PostRemoteKeyEntity(
+                                    type = PostRemoteKeyEntity.KeyType.BEFORE,
+                                    id = body.last().id,
+                                )
                             )
                         }
-
                         // postDao.removeAll()
                     }
 
